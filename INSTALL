@@ -1,0 +1,15 @@
+Para instalar este gerenciador de arquivos basta apenas
+digitar dois comandos gerados pelo Makefile;  você pode
+executa-lo como  usuário  normal e instalar apenas para
+você digitando:
+
+$ tar xfj sfm-versao.tar.bz2
+$ make
+
+Para instalar o gerenciador de janelas no sistema  para
+todos os usuários basta digitar 'make install'  no root
+
+# make install
+
+Obrigado por usar o SFM,
+Alexandre Mulatinho.

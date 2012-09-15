@@ -1,0 +1,37 @@
+# Makefile for file manager
+CFLAGS=`pkg-config --cflags gtk+-2.0` -W -Wall -funroll-loops -ggdb
+LIBS=`pkg-config --libs gtk+-2.0`
+LINK= $(CFLAGS) $(LIBS) -lpthread
+PATHBINR=/usr/local/bin/sfm
+PATHIMGS=/usr/share/pixmaps
+PATHCONF=/etc/sfm.conf
+
+all: sfm
+	
+action.o: strkey.c
+	gcc -o strkey.o -c strkey.c $(CFLAGS)
+
+action.o: action.c
+	gcc -o action.o -c action.c $(CFLAGS)
+	
+util.o: util.c
+	gcc -o util.o -c util.c $(CFLAGS)
+	
+main.o: main.c
+	gcc -o main.o -c main.c $(CFLAGS)
+	
+sfm: strkey.o util.o action.o main.o
+	gcc strkey.o util.o action.o main.o -o sfm $(LINK)
+
+install:
+	cp -f sfm.cfg $(PATHCONF)
+	mkdir -p /usr/local/bin
+	mkdir -p $(PATHIMGS)
+	cp sfm*png $(PATHIMGS)
+	cp sfm $(PATHBINR) 
+
+clean:
+	rm -rf *.o *~
+	if [ -f sfm ] ; then rm sfm; fi
+	if [ -f $(PATHBINR) ] ; then rm -f $(PATHBINR); fi
+	if [ -f $(PATHCONF) ] ; then rm -f $(PATHCONF); fi
