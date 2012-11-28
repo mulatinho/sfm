@@ -19,44 +19,43 @@
 
 #include "main.h"
 
-void select_menu(GtkWidget *wid, gint x, gint y) 
+void sfm_select_menu(GtkWidget *wid, gint x, gint y) 
 {
 	gchar *text=NULL;
-	char *p=NULL;
+	char *homeDir;
 
 	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
 // DEBUG
 	fprintf(stderr, "linha: %d. celula: %s\n", x, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
 
+	memset(sfm_current_path, 0, strlen(sfm_current_path));
 	if (!x) {
-		memset(path, 0, strlen(path));
-		strcpy(path, "/");
-
-		icon_scanfile(hbox, path, 1);
+		strcpy(sfm_current_path, "/");
+		sfm_scan_directory(hbox, sfm_current_path, 1);
 	} else if (x==1) {
-		memset(path, 0, strlen(path));
-		p = getenv("HOME");
+		homeDir = getenv("HOME");
+		fprintf(stdout, "home: %s\n", homeDir);
+		fprintf(stdout, "debug-> &p = %x | &p = %s | p = %s | *p = %s\n", &homeDir, &homeDir, homeDir, *homeDir);
 
-		strcpy(path, "/home/alexandre");
-		icon_scanfile(hbox, path, 1);
+		sfm_scan_directory(hbox, sfm_current_path, 1);
 	} else if (x==2) {
-	} else if (x==3) {
+		// SAMBA IS HERE
 	}
 
-	gtk_entry_set_text(GTK_ENTRY(entry1), path);
+	gtk_entry_set_text(GTK_ENTRY(entry1), sfm_current_path);
 }
 void do_select(GtkWidget *wid, gint x, gint y) 
 {
 	gchar *text=NULL;
-	gchar filen[256], filep[strlen(path)];
+	gchar filen[256], filep[strlen(sfm_current_path)];
 	int i;
 
 	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
-	fprintf(stderr, "linha: %d. celula: %s/%s -> %s\n", x, path, text, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
+	fprintf(stderr, "line: %d. cell: %s/%s -> %s\n", x, sfm_current_path, text, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
 
 	if (!strncmp(text,"..",2)) {
-		strcpy(filep, path);
-		fprintf(stderr, "DEBUG: %s -> %s\n", path, filep);
+		strcpy(filep, sfm_current_path);
+		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filep);
 		
 		for (i=strlen(filep); filep[i]!='/'; i--)
 			filep[i] = '\0';
@@ -65,95 +64,129 @@ void do_select(GtkWidget *wid, gint x, gint y)
 			filep[i] = '\0';
 		
 		snprintf(filen, 255, "%s\0", filep);
-		path = filen;
+		sfm_current_path = filen;
 		
-		fprintf(stderr, "DEBUG: %s -> %s\n", path, filen);
+		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filen);
 	} else {
-		fprintf(stderr, "DEBUG: %s -> %s\n", path, text);
-		snprintf(filen, 255, "%s/%s\0", path, text);
-		path = filen;
-		fprintf(stderr, "DEBUG: %s -> %s\n", path, filen);
+		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, text);
+		snprintf(filen, 255, "%s/%s\0", sfm_current_path, text);
+		sfm_current_path = filen;
+		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filen);
 	}
 	
 	gtk_clist_clear(GTK_CLIST(wid)); usleep(5);
 	
 	if (wid == clist)
-		list_scanfile(GTK_CLIST(clist_two), path);
+		list_scanfile(GTK_CLIST(clist_two), sfm_current_path);
 	else
 		fprintf(stdout, "clikei.\n");
 
 	text=NULL;
-	gtk_widget_show_all(win);
+	gtk_widget_show_all(sfm_win);
 }
 
-void do_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
+void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 {
 	gchar filen[256], testf[256];
 	struct stat obj;
 	int i;
 
-	fprintf(stderr, "==> %d\n", event->button);
+	fprintf(stderr, "==> %d\n", event->type);
 
 	if (event->type==5) {
 		if (!strcmp(p, "..")) {
-			for (i=strlen(path);i!=0;i--) {
-				if (path[i] == '/') {
-					path[i] = '\0';
+			for (i=strlen(sfm_current_path);i!=0;i--) {
+				if (sfm_current_path[i] == '/') {
+					sfm_current_path[i] = '\0';
 					break;
 				}
-				path[i] = '\0';
+				sfm_current_path[i] = '\0';
 			}
-			snprintf(filen, 255, "%s\0", path);
+			snprintf(filen, 255, "%s\0", sfm_current_path);
 			lstat(filen, &obj);
 		} else {
-			snprintf(testf, 255, "%s/%s\0", path, p);
+			snprintf(testf, 255, "%s/%s\0", sfm_current_path, p);
 			lstat(testf, &obj);
 
 			if (S_ISDIR(obj.st_mode))
-				snprintf(filen, 255, "%s/%s\0", path, p);
+				snprintf(filen, 255, "%s/%s\0", sfm_current_path, p);
 			else
-				snprintf(filen, 255, "%s\0", path);
+				snprintf(filen, 255, "%s\0", sfm_current_path);
 
-			snprintf(testf, 255, "%s/%s\0", path, p);
+			snprintf(testf, 255, "%s/%s\0", sfm_current_path, p);
 			lstat(testf, &obj);
 		}
 
-		strcpy(path,filen);
+		strcpy(sfm_current_path,filen);
 		gtk_entry_set_text(GTK_ENTRY(entry1), filen);
 
 		if (S_ISDIR(obj.st_mode))
-			icon_scanfile(hbox, path, 1);
+			sfm_scan_directory(hbox, sfm_current_path, 1);
 		else 
 			on_executefile(testf);
 		
 		// DEBUG
-		// fprintf(stderr, "path: %s -> %s\n", path, p);
+		fprintf(stderr, "sfm_current_path: %s -> %s\n", sfm_current_path, p);
 
 	}
 }
 
-void do_author(void)
+void sfm_about(void)
 {
-	warnm("About",
+	GtkWidget *about;
+	GdkPixbuf *sfm_pic;
+	GError *err_pix = NULL;
+	const gchar *license = {
+		"This program is free software; you can redistribute it and/or modify\n" \
+		"it under the terms of the GNU General Public License as published by\n" \
+		"the Free Software Foundation; either version 2 of the License.\n" \
+		"\n" \
+		"This program is distributed in the hope that it will be useful,\n" \
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of\n" \
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n" \
+		"GNU General Public License for more details.\n" \
+		"\n" \
+		"You should have received a copy of the GNU General Public License\n" \
+		"along with this program; if not, write to the Free Software\n" \
+		"Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,\n" \
+		"MA 02110-1301, USA."
+	};
 	
-	"Este gerenciador de arquivos foi desenvolvido em C embaixo da\n"
-	"biblioteca GTK e com o objetivo de rodar em maquinas de baixo\n"
-	"desempenho, implementado junto com o protocolo SMB/NFS/FTP/SSH.\n\n"
+	const gchar *sfm_authors[] = {
+		"Alexandre Mulatinho <alex@mulatinho.net>",
+		"Alexandre Alux <alexandre@aluxnet.com.br>",
+		NULL
+	};
 	
-	"Alexandre Mulatinho <alex@mulatinho.net> 2010.\n\n"
+	about = gtk_about_dialog_new();
 	
-	"Thanks to:\n"
-	"Alexandre Alux pelos icones.\n"
+	sfm_pic = gdk_pixbuf_new_from_file(SFM_IMAGES "/sfm.png", &err_pix);
+	if (err_pix == NULL)
+		gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(about), sfm_pic);
+	else {
+		fprintf(stderr, "err: %s\n", err_pix->message);
+		g_error_free(err_pix);
+	}
+
+	gtk_about_dialog_set_name(GTK_ABOUT_DIALOG(about), PROGNAME);
+	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(about), PROGVERSION);
+	gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(about), "(C) 2010 Alexandre Mulatinho");
+	gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(about), "A simple file manager to lightweight window managers.");
+	gtk_about_dialog_set_license(GTK_ABOUT_DIALOG(about), license);
+	gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(about), "http//github.com/mulatinho/sfm");
 	
-	, 550, 120);
+	gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(about), sfm_authors);
+	
+	gtk_dialog_run(GTK_DIALOG(about));
+	gtk_widget_destroy(about);
 }
 
-void do_cutfile(void)
+void sfm_cut_file(void)
 {
 	fprintf(stderr, ".");
 }
 
-void do_copyfile(void)
+void sfm_copy_file(void)
 {
 	fprintf(stderr, ".");
 }
