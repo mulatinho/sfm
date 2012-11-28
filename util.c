@@ -26,7 +26,7 @@ void do_exec(gchar *cmd)
 	system(cmd);
 }
 
-void on_executefile(gchar *filepath)
+void on_executefile(gchar *current_file)
 {
 	FILE *fp;
 	gchar *first=NULL, *cmd=NULL, *p=NULL;
@@ -35,19 +35,22 @@ void on_executefile(gchar *filepath)
 	gint i, f, q, l;
 	pthread_t tid;
 
+	memset(buf, 0, sizeof(buf));
+
 	f = 0; q = 0;
-	for (i=(strlen(filepath)-4); i<strlen(filepath); i++) {
-		if (filepath[i] == '.') 
+	for (i=(strlen(current_file)-4); i<strlen(current_file); i++) {
+		if (current_file[i] == '.') 
 			f++;
 
 		if (f) {
-			ext[q] = filepath[i];
+			ext[q] = current_file[i];
 			q++;
 		}
 	}
 
 	if (!q) {
-		snprintf(buf, sizeof(buf)-1, "xterm -e %s\0", filepath);
+		snprintf(buf, sizeof(buf)-1, "xdg-open %s", current_file);
+		fprintf(stdout, "debug: %s\n", buf);
 		do_exec(buf);
 
 	} else {
@@ -69,7 +72,7 @@ void on_executefile(gchar *filepath)
 					if (first[strlen(first)-1]=='\n')
 						first[strlen(first)-1] = '\0';
 
-					snprintf(buf, sizeof(buf)-1, "%s %s\0", first, filepath);
+					snprintf(buf, sizeof(buf)-1, "%s %s\0", first, current_file);
 					pthread_create(&tid, NULL, (void*)do_exec, buf);
 					f=pthread_join(tid, NULL);
 					if (!tid)
@@ -91,7 +94,7 @@ GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
 
 	eventbox = gtk_event_box_new();
 
-	snprintf(filen, FILENSIZ-1, "%s/%s\0", path, file);
+	snprintf(filen, FILENSIZ-1, "%s/%s\0", sfm_current_path, file);
 	lstat(filen, &obj);
 
 	if (S_ISDIR(obj.st_mode)) 
@@ -112,11 +115,11 @@ GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
 
 	gtk_fixed_put(GTK_FIXED(box), vbox, x, y);
 
-	g_signal_connect(GTK_OBJECT(eventbox), "button_press_event", G_CALLBACK(do_execute), file);
+	g_signal_connect(GTK_OBJECT(eventbox), "button_press_event", G_CALLBACK(sfm_execute), file);
 	return vbox;
 }
 
-void icon_scanfile(GtkWidget *wid, char *workpath, int hidden)
+void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 {
 	struct dirent **files;
 	struct stat obj;
@@ -139,12 +142,12 @@ void icon_scanfile(GtkWidget *wid, char *workpath, int hidden)
 	gtk_container_add(GTK_CONTAINER(scrolled), viewport);
 	gtk_container_add(GTK_CONTAINER(viewport), fixedright);
 
-	xstat = scandir(workpath, &files, 0, alphasort);
+	xstat = scandir(work_path, &files, 0, alphasort);
 	
 	y = 10;
 	for (loop=0,z=1; loop<xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, 255, "%s/%s\0",workpath,utf8);
+		snprintf(filen, 255, "%s/%s\0",work_path,utf8);
 
 		lstat(filen, &obj);
 			
@@ -184,7 +187,7 @@ void icon_scanfile(GtkWidget *wid, char *workpath, int hidden)
 	return;
 }
 
-void list_scanfile(GtkCList *clist, char *workpath, int hidden)
+void list_scanfile(GtkCList *clist, char *worksfm_current_path, int hidden)
 {
 	struct dirent **files;
 	struct stat obj;
@@ -192,12 +195,12 @@ void list_scanfile(GtkCList *clist, char *workpath, int hidden)
 	int loop, xstat, x, z;
 	char filen[128];
 
-	xstat = scandir(workpath, &files, 0, alphasort);
+	xstat = scandir(worksfm_current_path, &files, 0, alphasort);
 	text = malloc(xstat*FILENSIZ);
 	
 	for (loop=0,x=0; loop<xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, 127, "%s/%s\0",workpath,utf8);
+		snprintf(filen, 127, "%s/%s\0",worksfm_current_path,utf8);
 
 		lstat(filen, &obj);
 			
@@ -224,7 +227,7 @@ void warnm(gchar *title, gchar *message, gint x, gint y)
 {
        GtkWidget *dialog, *label; 
          
-       dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(win), GTK_DIALOG_DESTROY_WITH_PARENT,
+       dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm_win), GTK_DIALOG_DESTROY_WITH_PARENT,
                GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
 	   gtk_widget_set_usize(dialog, x, y);
          

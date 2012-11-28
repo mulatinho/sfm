@@ -27,23 +27,23 @@ int main(int argc, char **argv)
 	GtkItemFactory *item_factory;
 	GtkBox *box;
 	GtkAccelGroup *accel_group;
-	gchar buf[FILESIZ], **text;
+	gchar buf[NAME_MAX], **text;
 
 	gtk_init(&argc, &argv);
-	path = (char*)malloc(256);
+	sfm_current_path = (char*)malloc(256);
 
-	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title(GTK_WINDOW(win), PROGNAME);
-	gtk_window_set_default_size(GTK_WINDOW(win), 700, 480);
+	sfm_win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title(GTK_WINDOW(sfm_win), PROGNAME);
+	gtk_window_set_default_size(GTK_WINDOW(sfm_win), 700, 480);
 
 	vbox = gtk_vbox_new(FALSE, 1);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
-	gtk_container_add(GTK_CONTAINER(win), vbox);
+	gtk_container_add(GTK_CONTAINER(sfm_win), vbox);
 
 	accel_group = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
 	gtk_item_factory_create_items(item_factory, nmenu, menu_items, NULL);
-	gtk_window_add_accel_group(GTK_WINDOW(win), accel_group);
+	gtk_window_add_accel_group(GTK_WINDOW(sfm_win), accel_group);
 	menu = gtk_item_factory_get_widget(item_factory, "<main>");
 	gtk_box_pack_start(GTK_BOX(vbox), menu, FALSE, TRUE, 0);
 
@@ -64,25 +64,22 @@ int main(int argc, char **argv)
 	gtk_clist_set_shadow_type(GTK_CLIST(clist), GTK_SHADOW_OUT);
 
 	text = malloc(128 * 4); // 128 chars, 4 lines
-	snprintf(buf, FILESIZ-1, "$+ Raiz: /\0");
+	snprintf(buf, NAME_MAX-1, "$+ Raiz: /\0");
 	text[0] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[0]);
-	path = getenv("HOME");
-	snprintf(buf, FILESIZ-1, "$+ Home: %s\0", path);
+	sfm_current_path = getenv("HOME");
+	snprintf(buf, NAME_MAX-1, "$+ Home: %s\0", sfm_current_path);
 	text[1] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[1]);
-	snprintf(buf, FILESIZ-1, "$+ Rede Interna (SAMBA)\0");
+	snprintf(buf, NAME_MAX-1, "$+ Rede Interna (SAMBA)\0");
 	text[2] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[2]);
-	snprintf(buf, FILESIZ-1, "$+ Painel de Controle\0");
-	text[3] = (char*)buf;
-	gtk_clist_append(GTK_CLIST(clist), (char**)&text[3]);
 	free(text);
 
 	gtk_widget_set_usize(GTK_WIDGET(clist), 200, 70);
 	gtk_fixed_put(GTK_FIXED(fixed), clist, 5, 60);
 
-	snprintf(buf, FILESIZ-1, "%s/sfm.png\0", SFM_IMAGES);
+	snprintf(buf, NAME_MAX-1, "%s/sfm.png\0", SFM_IMAGES);
 	image = gtk_image_new_from_file(buf);
 	gtk_fixed_put(GTK_FIXED(fixed), image, 5, 160);
 
@@ -90,13 +87,13 @@ int main(int argc, char **argv)
 	viewport = gtk_viewport_new(NULL,NULL);
 	fixedright = gtk_fixed_new();
 
-	icon_scanfile(hbox, path, 1);
-	gtk_entry_set_text(GTK_ENTRY(entry1), path);
+	sfm_scan_directory(hbox, sfm_current_path, 1);
+	gtk_entry_set_text(GTK_ENTRY(entry1), sfm_current_path);
 
-	g_signal_connect(GTK_OBJECT(clist), "select_row", GTK_SIGNAL_FUNC(select_menu), NULL);
-	g_signal_connect(G_OBJECT(win), "delete_event", gtk_main_quit, NULL);
+	g_signal_connect(GTK_OBJECT(clist), "select_row", GTK_SIGNAL_FUNC(sfm_select_menu), NULL);
+	g_signal_connect(G_OBJECT(sfm_win), "delete_event", gtk_main_quit, NULL);
 
-	gtk_widget_show_all(win);
+	gtk_widget_show_all(sfm_win);
 	gtk_main();
 	
 	return 0;

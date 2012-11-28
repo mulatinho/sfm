@@ -19,53 +19,56 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
-
+#include <linux/limits.h>
 #include <gtk/gtk.h>
 #include <dirent.h>
 
-#define PROGNAME "SFM - Simple File Manager, v1.0.0"
+#define PROGNAME "SFM - Simple File Manager"
+#define PROGVERSION "1.0.1"
 #define SFM_IMAGES "./picz"
-#define SFM_CONF   "/etc/sfm.conf" 
-#define FILESIZ 128
+#define SFM_CONF "./sfm/sfm.conf" 
+#define SFM_CACHE "./sfm/cache" 
 
-void do_copyfile(void);
-void do_cutfile(void);
-void do_author(void);
-void do_execute(GtkWidget *, GdkEvent *, gpointer);
-void do_select(GtkWidget *, gint, gint); 
-void select_menu(GtkWidget *, gint, gint); 
-void icon_scanfile(GtkWidget *, char *, int);
+void sfm_init(void);
+void sfm_copy_file(void);
+void sfm_cut_file(void);
+void sfm_about(void);
+void sfm_execute(GtkWidget *, GdkEvent *, gpointer);
+void sfm_select_item(GtkWidget *, gint, gint); 
+void sfm_select_menu(GtkWidget *, gint, gint); 
+void sfm_scan_directory(GtkWidget *, char *, int);
 	
 static GtkItemFactoryEntry menu_items[] = {
-	{ "/_Arquivo",			NULL,         NULL,				0, "<Branch>" , 0 },
-	{ "/Arquivo/_Abrir",	"<control>A", NULL,				0, "<StockItem>", GTK_STOCK_OPEN },
-	{ "/Arquivo/sep1",		NULL,         NULL,				0, "<Separator>" , 0 },
-	{ "/Arquivo/_Sair",		"<control>S", gtk_main_quit,	0, "<StockItem>", GTK_STOCK_QUIT },
-	{ "/_Editar",			NULL, 		   NULL,			0, "<Branch>" , 0 },
-	{ "/Editar/_Executar",	"<control>E", do_execute,		0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Editar/sep1",		NULL,         NULL,				0, "<Separator>" , 0 },
-	{ "/Editar/Copiar",	"<control>C", do_copyfile,		0, "<StockItem>", GTK_STOCK_COPY },
-	{ "/Editar/Colar",		"<control>V", do_cutfile,		0, "<StockItem>", GTK_STOCK_CUT },
-	{ "/Editar/sep1",		NULL,         NULL,				0, "<Separator>", 0 },
-	{ "/Editar/_Preferencias",	NULL, do_execute,		0, "<StockItem>", GTK_STOCK_PROPERTIES },
-	{ "/_Visao",			NULL, 		   NULL,			0, "<Branch>", 0 },
-	{ "/Visao/_Lista",	"<control>E", do_execute,		0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Visao/_Icones Pequenos",	"<control>E", do_execute,	0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Visao/Icones _Grandes",	"<control>E", do_execute,	0, "<StockItem>", GTK_STOCK_ZOOM_100 },
-	{ "/_Sobre",            NULL,         NULL,			0, "<LastBranch>", 0 },
-	{ "/Sobre/_SFM", 	"<control>S", do_author,		0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
+	{ "/_Arquivo", NULL, NULL, 0, "<Branch>", 0 },
+	{ "/Arquivo/_Abrir", "<control>A", NULL, 0, "<StockItem>", GTK_STOCK_OPEN },
+	{ "/Arquivo/sep1", NULL, NULL, 0, "<Separator>", 0 },
+	{ "/Arquivo/_Sair", "<control>S", gtk_main_quit, 0, "<StockItem>", GTK_STOCK_QUIT },
+	{ "/_Editar", NULL, NULL, 0, "<Branch>", 0 },
+	{ "/Editar/_Executar", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/Editar/sep1", NULL, NULL, 0, "<Separator>", 0 },
+	{ "/Editar/Copiar", "<control>C", sfm_copy_file, 0, "<StockItem>", GTK_STOCK_COPY },
+	{ "/Editar/Colar", "<control>V", sfm_cut_file, 0, "<StockItem>", GTK_STOCK_CUT },
+	{ "/Editar/sep1", NULL, NULL, 0, "<Separator>", 0 },
+	{ "/Editar/_Preferencias", NULL, sfm_execute, 0, "<StockItem>", GTK_STOCK_PROPERTIES },
+	{ "/_Visao", NULL, NULL, 0, "<Branch>", 0 },
+	{ "/Visao/_Lista", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/Visao/_Icones Pequenos", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/Visao/Icones _Grandes", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_ZOOM_100 },
+	{ "/_Sobre", NULL, NULL, 0, "<LastBranch>", 0 },
+	{ "/Sobre/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
 
 static int nmenu = sizeof(menu_items) / sizeof(menu_items[0]);
 extern int alphasort();
-char *path;
+char *sfm_current_path;
 
-GtkWidget *win, *hbox;
+GtkWidget *sfm_win, *hbox;
 GtkWidget *clist, *clist_two;
 GtkWidget *scrolled, *viewport, *entry1, *fixedright;
 void warnm(gchar *, gchar *, gint, gint); 

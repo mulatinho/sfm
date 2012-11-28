@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	GtkWidget *scrolled, *image, *entry1, *label1, *button;
 	GtkItemFactory *item_factory;
 	GtkAccelGroup *accel_group;
-	gchar buf[FILESIZ], **text;
+	gchar buf[NAME_MAX], **text;
 
 	gtk_init(&argc, &argv);
 
@@ -64,20 +64,20 @@ int main(int argc, char **argv)
 	gtk_clist_set_shadow_type(GTK_CLIST(clist), GTK_SHADOW_OUT);
 
 	text = malloc(128 * 4); // 128 chars, 4 lines
-	snprintf(buf, FILESIZ-1, "$+ Raiz: /\0");
+	snprintf(buf, NAME_MAX-1, "$+ Raiz: /\0");
 	text[0] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[0]);
 
-	path = getenv("HOME");
-	snprintf(buf, FILESIZ-1, "$+ Home: %s\0", path);
+	sfm_current_path = getenv("HOME");
+	snprintf(buf, NAME_MAX-1, "$+ Home: %s\0", sfm_current_path);
 	text[1] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[1]);
 
-	snprintf(buf, FILESIZ-1, "$+ Rede Interna (SAMBA)\0");
+	snprintf(buf, NAME_MAX-1, "$+ Rede Interna (SAMBA)\0");
 	text[2] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[2]);
 
-	snprintf(buf, FILESIZ-1, "$+ Painel de Controle\0");
+	snprintf(buf, NAME_MAX-1, "$+ Painel de Controle\0");
 	text[3] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[3]);
 	gtk_box_pack_start(GTK_BOX(vbox2), clist, TRUE, TRUE, 0);
@@ -98,8 +98,8 @@ int main(int argc, char **argv)
 	gtk_clist_set_column_width(GTK_CLIST(clist_two), 20, 20);
 
 	//FIXME, COULD BE DANGEROUS
-	path = getenv("HOME");
-	list_scanfile(clist_two, path, 1);
+	sfm_current_path = getenv("HOME");
+	list_scanfile(clist_two, sfm_current_path, 1);
 	gtk_container_add(GTK_CONTAINER(scrolled), clist_two);
 
 	g_signal_connect(GTK_OBJECT(clist), "select_row", GTK_SIGNAL_FUNC(select_menu), NULL);
