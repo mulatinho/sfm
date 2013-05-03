@@ -22,24 +22,23 @@
 void sfm_select_menu(GtkWidget *wid, gint x, gint y) 
 {
 	gchar *text=NULL;
-	char *homeDir;
-
+	
 	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
+	
+	memset(sfm_current_path, '\0', NAME_MAX);
 // DEBUG
 	fprintf(stderr, "linha: %d. celula: %s\n", x, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
-
-	memset(sfm_current_path, 0, strlen(sfm_current_path));
+	
 	if (!x) {
-		strcpy(sfm_current_path, "/");
+		sfm_scan_directory(hbox, "/", 1);
+		snprintf(sfm_current_path, NAME_MAX-1, "/");
+	} else if (x == 1) {
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", text);
 		sfm_scan_directory(hbox, sfm_current_path, 1);
-	} else if (x==1) {
-		homeDir = getenv("HOME");
-		fprintf(stdout, "home: %s\n", homeDir);
-		fprintf(stdout, "debug-> &p = %x | &p = %s | p = %s | *p = %s\n", &homeDir, &homeDir, homeDir, *homeDir);
-
-		sfm_scan_directory(hbox, sfm_current_path, 1);
-	} else if (x==2) {
-		// SAMBA IS HERE
+	} else if (x == 2) {
+		snprintf(sfm_current_path, NAME_MAX-1, "smb://");
+	} else if (x == 3) {
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", text);
 	}
 
 	gtk_entry_set_text(GTK_ENTRY(entry1), sfm_current_path);
@@ -47,15 +46,17 @@ void sfm_select_menu(GtkWidget *wid, gint x, gint y)
 void do_select(GtkWidget *wid, gint x, gint y) 
 {
 	gchar *text=NULL;
-	gchar filen[256], filep[strlen(sfm_current_path)];
+	gchar filen[NAME_MAX], filep[NAME_MAX];
 	int i;
+
+	memset(filen, '\0', sizeof(filen));
+	memset(filep, '\0', sizeof(filep));
 
 	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
 	fprintf(stderr, "line: %d. cell: %s/%s -> %s\n", x, sfm_current_path, text, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
 
 	if (!strncmp(text,"..",2)) {
 		strcpy(filep, sfm_current_path);
-		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filep);
 		
 		for (i=strlen(filep); filep[i]!='/'; i--)
 			filep[i] = '\0';
@@ -63,14 +64,13 @@ void do_select(GtkWidget *wid, gint x, gint y)
 		if (i)
 			filep[i] = '\0';
 		
-		snprintf(filen, 255, "%s\0", filep);
-		sfm_current_path = filen;
+		snprintf(filen, NAME_MAX-1, "%s", filep);
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", filen);
 		
 		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filen);
 	} else {
-		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, text);
-		snprintf(filen, 255, "%s/%s\0", sfm_current_path, text);
-		sfm_current_path = filen;
+		snprintf(filen, NAME_MAX, "%s/%s", sfm_current_path, text);
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", filen);
 		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filen);
 	}
 	
@@ -87,10 +87,13 @@ void do_select(GtkWidget *wid, gint x, gint y)
 
 void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 {
-	gchar filen[256], testf[256];
+	gchar filen[NAME_MAX], testf[NAME_MAX];
 	struct stat obj;
 	int i;
 
+	memset(filen, '\0', sizeof(filen));
+	memset(testf, '\0', sizeof(testf));
+	
 	fprintf(stderr, "==> %d\n", event->type);
 
 	if (event->type==5) {
@@ -102,18 +105,18 @@ void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 				}
 				sfm_current_path[i] = '\0';
 			}
-			snprintf(filen, 255, "%s\0", sfm_current_path);
+			snprintf(filen, NAME_MAX-1, "%s", sfm_current_path);
 			lstat(filen, &obj);
 		} else {
-			snprintf(testf, 255, "%s/%s\0", sfm_current_path, p);
+			snprintf(testf, NAME_MAX-1, "%s/%s", sfm_current_path, p);
 			lstat(testf, &obj);
 
 			if (S_ISDIR(obj.st_mode))
-				snprintf(filen, 255, "%s/%s\0", sfm_current_path, p);
+				snprintf(filen, NAME_MAX-1, "%s/%s", sfm_current_path, p);
 			else
-				snprintf(filen, 255, "%s\0", sfm_current_path);
+				snprintf(filen, NAME_MAX-1, "%s", sfm_current_path);
 
-			snprintf(testf, 255, "%s/%s\0", sfm_current_path, p);
+			snprintf(testf, NAME_MAX-1, "%s/%s", sfm_current_path, p);
 			lstat(testf, &obj);
 		}
 

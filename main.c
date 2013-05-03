@@ -30,11 +30,12 @@ int main(int argc, char **argv)
 	gchar buf[NAME_MAX], **text;
 
 	gtk_init(&argc, &argv);
-	sfm_current_path = (char*)malloc(256);
+	memset(sfm_current_path, '\0', sizeof(sfm_current_path));
+	snprintf(sfm_current_path, NAME_MAX-1, "%s", getenv("HOME"));
 
 	sfm_win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(sfm_win), PROGNAME);
-	gtk_window_set_default_size(GTK_WINDOW(sfm_win), 700, 480);
+	gtk_window_set_default_size(GTK_WINDOW(sfm_win), 800, 460);
 
 	vbox = gtk_vbox_new(FALSE, 1);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
@@ -63,17 +64,24 @@ int main(int argc, char **argv)
 	clist = gtk_clist_new(1);
 	gtk_clist_set_shadow_type(GTK_CLIST(clist), GTK_SHADOW_OUT);
 
-	text = malloc(128 * 4); // 128 chars, 4 lines
-	snprintf(buf, NAME_MAX-1, "$+ Raiz: /\0");
+	text = malloc(NAME_MAX * 5); // NAME_MAX chars, 5 lines
+	
+	snprintf(buf, NAME_MAX-1, "raiz: /\0");
 	text[0] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[0]);
-	sfm_current_path = getenv("HOME");
-	snprintf(buf, NAME_MAX-1, "$+ Home: %s\0", sfm_current_path);
-	text[1] = (char*)buf;
+	
+	text[1] = getenv("HOME");
+	snprintf(buf, NAME_MAX-1, "home: %s\0", text[1]);
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[1]);
-	snprintf(buf, NAME_MAX-1, "$+ Rede Interna (SAMBA)\0");
+	
+	snprintf(buf, NAME_MAX-1, "smb://host/dir\0");
 	text[2] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(clist), (char**)&text[2]);
+	
+	snprintf(buf, NAME_MAX-1, "ssh://user@host\0");
+	text[3] = (char*)buf;
+	gtk_clist_append(GTK_CLIST(clist), (char**)&text[3]);
+	
 	free(text);
 
 	gtk_widget_set_usize(GTK_WIDGET(clist), 200, 70);
@@ -84,8 +92,11 @@ int main(int argc, char **argv)
 	gtk_fixed_put(GTK_FIXED(fixed), image, 5, 160);
 
 	scrolled = gtk_scrolled_window_new(NULL, NULL);
-	viewport = gtk_viewport_new(NULL,NULL);
+	viewport = gtk_viewport_new(NULL, NULL);
 	fixedright = gtk_fixed_new();
+
+
+	fprintf(stdout, "%d\n", NAME_MAX);
 
 	sfm_scan_directory(hbox, sfm_current_path, 1);
 	gtk_entry_set_text(GTK_ENTRY(entry1), sfm_current_path);

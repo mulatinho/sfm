@@ -19,7 +19,7 @@
 
 #include "main.h"
 #define MAXFILEZ 512
-#define FILENSIZ 128
+#define FILENSIZ NAME_MAX
 
 void do_exec(gchar *cmd)
 {
@@ -35,7 +35,7 @@ void on_executefile(gchar *current_file)
 	gint i, f, q, l;
 	pthread_t tid;
 
-	memset(buf, 0, sizeof(buf));
+	memset(buf, '\0', sizeof(buf));
 
 	f = 0; q = 0;
 	for (i=(strlen(current_file)-4); i<strlen(current_file); i++) {
@@ -72,7 +72,7 @@ void on_executefile(gchar *current_file)
 					if (first[strlen(first)-1]=='\n')
 						first[strlen(first)-1] = '\0';
 
-					snprintf(buf, sizeof(buf)-1, "%s %s\0", first, current_file);
+					snprintf(buf, sizeof(buf)-1, "%s %s", first, current_file);
 					pthread_create(&tid, NULL, (void*)do_exec, buf);
 					f=pthread_join(tid, NULL);
 					if (!tid)
@@ -94,7 +94,7 @@ GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
 
 	eventbox = gtk_event_box_new();
 
-	snprintf(filen, FILENSIZ-1, "%s/%s\0", sfm_current_path, file);
+	snprintf(filen, FILENSIZ-1, "%s/%s", sfm_current_path, file);
 	lstat(filen, &obj);
 
 	if (S_ISDIR(obj.st_mode)) 
@@ -147,19 +147,19 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 	y = 10;
 	for (loop=0,z=1; loop<xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, 255, "%s/%s\0",work_path,utf8);
+		snprintf(filen, NAME_MAX, "%s/%s",work_path,utf8);
 
 		lstat(filen, &obj);
 			
 //		if (!(z % 5))
 		if (!(z % 4))
-			y += 120;
+			y += 140;
 
-		x = (z%4) * 120;
+		x = (z%4) * 150;
 		//x = (z%5) * 90;
 
 		for (r=0,t=0;t<=strlen(utf8);t++) {
-			if (!(t%15) && t!=0) {
+			if (!(t%25) && t!=0) {
 				iconname[r] = '\n';
 				r++;
 			}
@@ -180,7 +180,7 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 
 		// DEBUG
 	//	fprintf(stderr, "%d->%s x:%d,y:%d\n", z, utf8, x, y);
-		memset(filen, 0, 255); z++;
+		memset(filen, '\0', NAME_MAX); z++;
 	}
 
 	gtk_widget_show_all(hbox);
@@ -193,14 +193,14 @@ void list_scanfile(GtkCList *clist, char *worksfm_current_path, int hidden)
 	struct stat obj;
 	char **text, *utf8;
 	int loop, xstat, x, z;
-	char filen[128];
+	char filen[NAME_MAX];
 
 	xstat = scandir(worksfm_current_path, &files, 0, alphasort);
 	text = malloc(xstat*FILENSIZ);
 	
 	for (loop=0,x=0; loop<xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, 127, "%s/%s\0",worksfm_current_path,utf8);
+		snprintf(filen, NAME_MAX, "%s/%s",worksfm_current_path,utf8);
 
 		lstat(filen, &obj);
 			
@@ -213,7 +213,7 @@ void list_scanfile(GtkCList *clist, char *worksfm_current_path, int hidden)
 				x--;
 		}
 
-		memset(filen, 0, 128); x++;
+		memset(filen, '\0', NAME_MAX); x++;
 	}
 
 	for (loop=0; loop<x; loop++)

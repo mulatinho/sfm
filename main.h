@@ -66,7 +66,7 @@ static GtkItemFactoryEntry menu_items[] = {
 
 static int nmenu = sizeof(menu_items) / sizeof(menu_items[0]);
 extern int alphasort();
-char *sfm_current_path;
+char sfm_current_path[NAME_MAX];
 
 GtkWidget *sfm_win, *hbox;
 GtkWidget *clist, *clist_two;

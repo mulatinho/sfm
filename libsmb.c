@@ -14,14 +14,18 @@ int sfm_smb_list(SMBCCTX *smb, char *host)
 	}
 
 	while ((smbdir = smbc_readdir(dirfd)) != NULL) {
-		if (smbdir->smbc_type == SMBC_FILE) {
-			fprintf(stdout, "%d arquivo,\t", smbdir->smbc_type);
+		if (smbdir->smbc_type == SMBC_WORKGROUP) {
+			fprintf(stdout, "%d, grupo de trabalho,\t", smbdir->smbc_type);
+		} else if (smbdir->smbc_type == SMBC_SERVER) {
+			fprintf(stdout, "%d, maquina,\t", smbdir->smbc_type);
+		} else if (smbdir->smbc_type == SMBC_FILE) {
+			fprintf(stdout, "%d, arquivo,\t", smbdir->smbc_type);
 		} else if (smbdir->smbc_type == SMBC_DIR) {
 			fprintf(stdout, "%d, diretorio,\t", smbdir->smbc_type);
 		} else if (smbdir->smbc_type == SMBC_FILE_SHARE) {
 			fprintf(stdout, "%d, compartilhamento,\t", smbdir->smbc_type);
 		} else if (smbdir->smbc_type == SMBC_PRINTER_SHARE) {
-			fprintf(stdout, "%d, impressora,\t", smbdir->smbc_type);
+			fprintf(stdout, "%d, impressora,\t\t", smbdir->smbc_type);
 		} else {
 			fprintf(stdout, "%d, desconhecido,\t", smbdir->smbc_type);
 		}
@@ -32,7 +36,7 @@ int sfm_smb_list(SMBCCTX *smb, char *host)
 	return 0;
 }
 
-int sfm_smb_get(SMBCCTX *smb, char *fName)
+int sfm_smb_recv(SMBCCTX *smb, char *fName)
 {
 	int i, j, rfd, lfd, bytes;
 	char fn[256], buffer[1024];
@@ -64,27 +68,29 @@ int sfm_smb_get(SMBCCTX *smb, char *fName)
 	return 0;
 }
 
-int sfm_smb_put(SMBCCTX *smb, char *fName)
+int sfm_smb_send(SMBCCTX *smb, char *fName)
 {
 	return 0;
 }
 
-int main(int argc, char **argv)
+int sfm_smb_exec(char *line)
 {
 	int i;
-	char buffer[256];
 	SMBCCTX *smbcontext;
+	
+	if (!line)
+		return -1;
 
-	if ((argc < 3) || (strncmp(argv[1],"list",4) && strncmp(argv[1],"copy",4) && strncmp(argv[1],"put",3))) {
-		fprintf(stderr, "uso: %s [list|copy|put] <smb://host/remotedir>\n" \
+	if (strncmp(line,"list",4) && strncmp(line,"recv",4) && strncmp(line,"send",3)) {
+		fprintf(stderr, "uso: ./program [list|recv|send] <smb://host/remotedir>\n" \
 		"\tlist\t\t lista um diretorio remoto.\n" \
-		"\tcopy\t\t copia um arquivo remoto para a maquina local.\n" \
-		"\tput\t\t envia um arquivo para o diretorio remoto.\n" \
-		"obrigado por usar a libsmb.\n",	argv[0]);
+		"\trecv\t\t copia um arquivo remoto para a maquina local.\n" \
+		"\tsend\t\t envia um arquivo para o diretorio remoto.\n" \
+		"obrigado por usar a libsmb.\n");
 		return -1;
 	} 
-
-	if (strlen(argv[2]) < 8) {
+/*
+	if (strlen(argv[2]) < 6) {
 		fprintf(stderr, "erro no diretorio remoto, exemplo: smb://10.10.10.12/public\n");
 		return -2;
 	} else if (strlen(argv[2]) > 96) {
@@ -108,11 +114,16 @@ int main(int argc, char **argv)
 
 	if (!strncmp(argv[1],"list",4)) {
 		sfm_smb_list(smbcontext, argv[2]);
-	} else if (!strncmp(argv[1],"copy",4)) {
-		sfm_smb_get(smbcontext, argv[2]);
-	} else if (!strncmp(argv[1],"put",3)) {
-		sfm_smb_put(smbcontext, argv[2]);
+	} else if (!strncmp(argv[1],"recv",4)) {
+		sfm_smb_recv(smbcontext, argv[2]);
+	} else if (!strncmp(argv[1],"send",3)) {
+		sfm_smb_send(smbcontext, argv[2]);
 	}
 
-	return 0;
+	return 0; */
+}
+
+int main(void)
+{
+	sfm_smb_exec("list smb://");
 }
