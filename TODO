@@ -1,8 +1,7 @@
 * SFM CORE
-  Support for FTP
-  Support for SSH
-  Support for SMB with libsmbclient
+  Support for two new file systems: FTP and SSH
+  Support for put remote files in SMB with libsmbclient
 
 * SFM GUI
   - Rearrange the main left menu.
-  - Set the action for menu items.
+  - Set the action for menu items with right mouse click.

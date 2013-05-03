@@ -1,0 +1,41 @@
+commit 1118c3b2ef2083852292b5c4c9bbc3960630ce76
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Thu May 2 22:37:56 2013 -0300
+
+    fixing function names, copy remote file feature added
+
+commit cf5422ddb59d269d8bd40c50ab18098122ff44db
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Wed May 1 01:33:14 2013 -0300
+
+    basic library to work with smb context
+
+commit 6ab01cd62767ddb92bdd29c3414c3ad01ae6da49
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Tue Dec 11 23:03:38 2012 -0200
+
+    Update README.md
+
+commit 69141727a5c74248e41b35b7f2100f5a9446b1a8
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Wed Nov 28 13:44:38 2012 -0300
+
+    change names of principal functions and variables
+
+commit c688db0f9d9157c3b002b51d4c405be7901baf5f
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Wed Nov 28 13:44:07 2012 -0300
+
+    modify license and todo to make some new features in future
+
+commit d7a742f945cf6f8aae0cfe7f7ba7e1f00bcf0b54
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Wed Nov 28 13:42:46 2012 -0300
+
+    change about dialog and some principal variables
+
+commit 4286efa114810484e6f39ecfb85519edbd3a1c2d
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Sat Sep 15 18:03:13 2012 -0300
+
+    first commit of sfm
