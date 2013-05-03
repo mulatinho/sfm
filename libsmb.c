@@ -2,9 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libsmbclient.h>
-#include <netdb.h>
 
-int sfm_list_smb(SMBCCTX *smb, char *host)
+int sfm_smb_list(SMBCCTX *smb, char *host)
 {
 	int dirfd;
 	struct smbc_dirent *smbdir;
@@ -14,58 +13,84 @@ int sfm_list_smb(SMBCCTX *smb, char *host)
 		return -4;
 	}
 
-	fprintf(stdout, "lendo conteudo...\n");
 	while ((smbdir = smbc_readdir(dirfd)) != NULL) {
-		fprintf(stdout, "name: %s, [type: %d, length: %d, comment: %s]\n", smbdir->name, smbdir->smbc_type, smbdir->commentlen, smbdir->comment);
+		if (smbdir->smbc_type == SMBC_FILE) {
+			fprintf(stdout, "%d arquivo,\t", smbdir->smbc_type);
+		} else if (smbdir->smbc_type == SMBC_DIR) {
+			fprintf(stdout, "%d, diretorio,\t", smbdir->smbc_type);
+		} else if (smbdir->smbc_type == SMBC_FILE_SHARE) {
+			fprintf(stdout, "%d, compartilhamento,\t", smbdir->smbc_type);
+		} else if (smbdir->smbc_type == SMBC_PRINTER_SHARE) {
+			fprintf(stdout, "%d, impressora,\t", smbdir->smbc_type);
+		} else {
+			fprintf(stdout, "%d, desconhecido,\t", smbdir->smbc_type);
+		}
+		fprintf(stdout, "%s\n", smbdir->name);
 	}
 
 	smbc_closedir(dirfd);
 	return 0;
 }
 
-int sfm_getfile_smb(SMBCCTX *smb, char *fName)
+int sfm_smb_get(SMBCCTX *smb, char *fName)
 {
-	int fd, bytes;
-	char buffer[1024];
+	int i, j, rfd, lfd, bytes;
+	char fn[256], buffer[1024];
 	
-	if ((fd = smbc_open(fName, O_RDONLY, 0)) <= 0) {
+	memset(fn, '\0', sizeof(fn));
+	for (i=strlen(fName); fName[i] != '/'; i--); i++;
+	
+	for (j=0; i<strlen(fName); j++, i++)
+		fn[j] = fName[i];
+	
+	if ((rfd = smbc_open(fName, O_RDONLY, 0)) <= 0) {
 		fprintf(stderr, "nao consegui abrir o caminho '%s'\n", fName);
+		return -1;
+	} else if ((lfd = open(fn, O_CREAT|O_WRONLY|O_APPEND, S_IWUSR|S_IRUSR)) <= 0) {
+		fprintf(stderr, "nao consegui abrir o arquivo '%s' localmente\n", fn);
 		return -1;
 	}
 	
-	fprintf(stdout, "url '%s' is opened..\n", fName);
-	while ((bytes = smbc_read(fd, buffer, sizeof(buffer)))) {
-		fprintf(stdout, "%s", buffer);
+	while ((bytes = smbc_read(rfd, buffer, sizeof(buffer)))) {
+		write(lfd, buffer, sizeof(buffer));
 		memset(buffer, '\0', sizeof(buffer));
 	}
+	
+	smbc_closedir(rfd);
+	close(lfd);
+
+	fprintf(stdout, "file'%s' is written in localhost.\n", fn);
+	
 	return 0;
 }
 
-int sfm_putfile_smb(SMBCCTX *smb, char *fName)
+int sfm_smb_put(SMBCCTX *smb, char *fName)
 {
 	return 0;
 }
 
 int main(int argc, char **argv)
 {
+	int i;
+	char buffer[256];
 	SMBCCTX *smbcontext;
-	//struct hostent *in;
 
-	if (argc < 2) {
-		fprintf(stderr, "uso: %s <smb path> (e.g.: smb://sf002747)\n", argv[0]);
+	if ((argc < 3) || (strncmp(argv[1],"list",4) && strncmp(argv[1],"copy",4) && strncmp(argv[1],"put",3))) {
+		fprintf(stderr, "uso: %s [list|copy|put] <smb://host/remotedir>\n" \
+		"\tlist\t\t lista um diretorio remoto.\n" \
+		"\tcopy\t\t copia um arquivo remoto para a maquina local.\n" \
+		"\tput\t\t envia um arquivo para o diretorio remoto.\n" \
+		"obrigado por usar a libsmb.\n",	argv[0]);
 		return -1;
+	} 
+
+	if (strlen(argv[2]) < 8) {
+		fprintf(stderr, "erro no diretorio remoto, exemplo: smb://10.10.10.12/public\n");
+		return -2;
+	} else if (strlen(argv[2]) > 96) {
+		fprintf(stderr, "caminho remoto muito longo.\n");
+		return -2;
 	}
-
-
-	fprintf(stdout, "argv1: %s\n", argv[1]);
-
-
-//	if (argv[1])
-//		in = gethostbyname(argv[1]);
-
-	//while (in->h_addr_list++) {
-//		fprintf(stdout, "%s\n", in->h_name);
-	//}
 
 	smbcontext = smbc_new_context();
 	if (!smbcontext) {
@@ -79,8 +104,15 @@ int main(int argc, char **argv)
 	}
 
 	smbc_set_context(smbcontext);
-	//sfm_list_smb(smbcontext, argv[1]);
-	sfm_getfile_smb(smbcontext, argv[1]);
+	//fprintf(stdout, "cmd: %4s, host: %s\n", argv[1], argv[2]);
+
+	if (!strncmp(argv[1],"list",4)) {
+		sfm_smb_list(smbcontext, argv[2]);
+	} else if (!strncmp(argv[1],"copy",4)) {
+		sfm_smb_get(smbcontext, argv[2]);
+	} else if (!strncmp(argv[1],"put",3)) {
+		sfm_smb_put(smbcontext, argv[2]);
+	}
 
 	return 0;
 }
