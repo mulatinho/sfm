@@ -55,7 +55,7 @@ void on_executefile(gchar *current_file)
 
 	memset(buf, '\0', sizeof(buf));
 
-	snprintf(buf, sizeof(buf)-1, "xdg-open %s", current_file);
+	snprintf(buf, sizeof(buf)-1, "xdg-open \"%s\"", current_file);
 	fprintf(stdout, "debug: %s\n", buf);
 
 	pthread_create(&tid, NULL, (void*)sfm_bash_exec, buf);
@@ -103,6 +103,9 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 	int loop, xstat, x, y, z, t, r;
 	char iconname[256], filen[256];
 
+	memset(filen, '\0', NAME_MAX);
+	memset(iconname, '\0', NAME_MAX);
+
 	gtk_widget_destroy(fixedright);
 	gtk_widget_destroy(viewport);
 	gtk_widget_destroy(scrolled);
@@ -135,7 +138,7 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 		x = (z%4) * 120;
 
 		for (r=0,t=0;t<=strlen(utf8);t++) {
-			if (!(t%12) && t!=0) {
+			if (!(t%11) && t!=0) {
 				iconname[r] = '\n';
 				r++;
 			}
@@ -143,8 +146,7 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 			iconname[r] = utf8[t];
 			r++;
 		}
-		iconname[t] = '\0'; 
-
+		
 		if (!hidden)
 			create_icone(fixedright, (char*)iconname, (char*)utf8, x, y);
 		else {
