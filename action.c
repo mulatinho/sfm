@@ -37,6 +37,7 @@ void sfm_select_menu(GtkWidget *wid, gint x, gint y)
 		sfm_scan_directory(hbox, sfm_current_path, 1);
 	} else if (x == 2) {
 		snprintf(sfm_current_path, NAME_MAX-1, "smb://");
+		sfm_smb_exec("list smb://");
 	} else if (x == 3) {
 		snprintf(sfm_current_path, NAME_MAX-1, "%s", text);
 	}

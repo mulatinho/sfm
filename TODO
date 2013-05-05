@@ -1,6 +1,7 @@
 * SFM CORE
   Support for two new file systems: FTP and SSH
   Support for put remote files in SMB with libsmbclient
+  Adicionar suporte a modificação dos principais MIMEs - ~/.local/share/applications/mimeapps.list
 
 * SFM GUI
   - Rearrange the main left menu.
