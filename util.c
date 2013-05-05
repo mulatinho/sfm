@@ -21,69 +21,45 @@
 #define MAXFILEZ 512
 #define FILENSIZ NAME_MAX
 
-void do_exec(gchar *cmd)
-{
-	system(cmd);
-}
-
-void on_executefile(gchar *current_file)
+char *sfm_bash_exec(char *cmd)
 {
 	FILE *fp;
-	gchar *first=NULL, *cmd=NULL, *p=NULL;
-	gchar file[256], buf[256];
-	gchar ext[16];
-	gint i, f, q, l;
+	char buf[256];
+	char *ret = (char*)malloc(sizeof(buf));
+	int totalbytez = 0;
+
+	memset(ret, 0, sizeof(buf));
+
+	fp = popen(cmd, "r");
+	while (fgets(buf, sizeof(buf)-1, fp)) {
+		totalbytez+=strlen(buf);
+
+		if (totalbytez > 12)
+			ret = (char*)realloc(ret, totalbytez);
+
+		strncat(ret, buf, strlen(buf)-1);
+	}
+	fclose(fp);
+
+	if (!strlen(ret))
+		return NULL;
+	else
+		return (char*)ret;
+		
+	pthread_exit(NULL);
+}
+void on_executefile(gchar *current_file)
+{
+	gchar buf[256];
 	pthread_t tid;
 
 	memset(buf, '\0', sizeof(buf));
 
-	f = 0; q = 0;
-	for (i=(strlen(current_file)-4); i<strlen(current_file); i++) {
-		if (current_file[i] == '.') 
-			f++;
+	snprintf(buf, sizeof(buf)-1, "xdg-open %s", current_file);
+	fprintf(stdout, "debug: %s\n", buf);
 
-		if (f) {
-			ext[q] = current_file[i];
-			q++;
-		}
-	}
-
-	if (!q) {
-		snprintf(buf, sizeof(buf)-1, "xdg-open %s", current_file);
-		fprintf(stdout, "debug: %s\n", buf);
-		do_exec(buf);
-
-	} else {
-		ext[q++] = '\0';
-
-		/* FIXME: Dont use a config file to choice what is open this file.
-		if ((fp = fopen(SFM_CONF, "r"))) {
-			while (fgets(buf, sizeof(buf)-1, fp)) {
-				p = (char*)strkey(buf,0,';');
-
-				if (!strncmp(ext, p, strlen(ext)))
-					cmd = (char*)strkey(buf,1,';');
-				
-			}
-
-			if (cmd) {
-				l=0; f=0;
-				while ((first = (char*)strkey(cmd,l,','))) {
-					if (first[strlen(first)-1]=='\n')
-						first[strlen(first)-1] = '\0';
-
-					snprintf(buf, sizeof(buf)-1, "%s %s", first, current_file);
-					pthread_create(&tid, NULL, (void*)do_exec, buf);
-					f=pthread_join(tid, NULL);
-					if (!tid)
-						break;
-					l++;
-				}
-			}
-
-			fclose(fp);
-		} */
-	}
+	pthread_create(&tid, NULL, (void*)sfm_bash_exec, buf);
+	pthread_join(tid, NULL); 
 }
 
 GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
@@ -150,16 +126,16 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 		snprintf(filen, NAME_MAX, "%s/%s",work_path,utf8);
 
 		lstat(filen, &obj);
-			
-//		if (!(z % 5))
+		
+		/* Numero de colunas */
 		if (!(z % 4))
 			y += 140;
 
-		x = (z%4) * 150;
-		//x = (z%5) * 90;
+		/* Tamanho de cada area/icone */
+		x = (z%4) * 120;
 
 		for (r=0,t=0;t<=strlen(utf8);t++) {
-			if (!(t%25) && t!=0) {
+			if (!(t%12) && t!=0) {
 				iconname[r] = '\n';
 				r++;
 			}
@@ -178,8 +154,6 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 				z--;
 		}
 
-		// DEBUG
-	//	fprintf(stderr, "%d->%s x:%d,y:%d\n", z, utf8, x, y);
 		memset(filen, '\0', NAME_MAX); z++;
 	}
 
