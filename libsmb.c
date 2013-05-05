@@ -75,11 +75,17 @@ int sfm_smb_send(SMBCCTX *smb, char *fName)
 
 int sfm_smb_exec(char *line)
 {
-	int i;
+	int i, flag;
 	SMBCCTX *smbcontext;
+	char cmd[8], host[256];
+	
+	memset(cmd, '\0', sizeof(cmd));
+	memset(host, '\0', sizeof(host));
 	
 	if (!line)
 		return -1;
+		
+	fprintf(stdout, "debug: %s\n", line);
 
 	if (strncmp(line,"list",4) && strncmp(line,"recv",4) && strncmp(line,"send",3)) {
 		fprintf(stderr, "uso: ./program [list|recv|send] <smb://host/remotedir>\n" \
@@ -89,11 +95,23 @@ int sfm_smb_exec(char *line)
 		"obrigado por usar a libsmb.\n");
 		return -1;
 	} 
-/*
-	if (strlen(argv[2]) < 6) {
+	
+	for (i=0,flag=0; i<strlen(line); i++) {
+		if (!flag) {
+			if (line[i] == ' ')
+				flag++;
+			else
+				cmd[i] = line[i];
+		} else if (flag) {
+			host[flag-1] = line[i];
+			flag++;
+		}
+	}
+
+	if (strlen(host) < 6) {
 		fprintf(stderr, "erro no diretorio remoto, exemplo: smb://10.10.10.12/public\n");
 		return -2;
-	} else if (strlen(argv[2]) > 96) {
+	} else if (strlen(host) > 96) {
 		fprintf(stderr, "caminho remoto muito longo.\n");
 		return -2;
 	}
@@ -110,20 +128,15 @@ int sfm_smb_exec(char *line)
 	}
 
 	smbc_set_context(smbcontext);
-	//fprintf(stdout, "cmd: %4s, host: %s\n", argv[1], argv[2]);
+	fprintf(stdout, "wee!! cmd '%s' host '%s'\n", cmd, host);
 
-	if (!strncmp(argv[1],"list",4)) {
-		sfm_smb_list(smbcontext, argv[2]);
-	} else if (!strncmp(argv[1],"recv",4)) {
-		sfm_smb_recv(smbcontext, argv[2]);
-	} else if (!strncmp(argv[1],"send",3)) {
-		sfm_smb_send(smbcontext, argv[2]);
-	}
+	if (!strncmp(cmd,"list",4)) {
+		sfm_smb_list(smbcontext, host);
+	} else if (!strncmp(cmd,"recv",4)) {
+		sfm_smb_recv(smbcontext, host);
+	} else if (!strncmp(cmd,"send",3)) {
+		sfm_smb_send(smbcontext, host);
+	} 
 
-	return 0; */
-}
-
-int main(void)
-{
-	sfm_smb_exec("list smb://");
+	return 0; 
 }

@@ -1,5 +1,5 @@
 # Makefile for file manager
-CFLAGS=`pkg-config --cflags gtk+-2.0` -W -Wall -funroll-loops -ggdb
+CFLAGS=`pkg-config --cflags gtk+-2.0` -W -Wall -funroll-loops -ggdb -lsmbclient
 LIBS=`pkg-config --libs gtk+-2.0`
 LINK= $(CFLAGS) $(LIBS) -lpthread
 PATHBINR=/usr/local/bin/sfm
@@ -8,8 +8,11 @@ PATHCONF=/etc/sfm.conf
 
 all: sfm
 	
-action.o: strkey.c
+strkey.o: strkey.c
 	gcc -o strkey.o -c strkey.c $(CFLAGS)
+
+libsmb.o: libsmb.c
+	gcc -o libsmb.o -c libsmb.c $(CFLAGS)
 
 action.o: action.c
 	gcc -o action.o -c action.c $(CFLAGS)
@@ -20,8 +23,8 @@ util.o: util.c
 main.o: main.c
 	gcc -o main.o -c main.c $(CFLAGS)
 	
-sfm: strkey.o util.o action.o main.o
-	gcc strkey.o util.o action.o main.o -o sfm $(LINK)
+sfm: strkey.o util.o action.o libsmb.o main.o
+	gcc strkey.o util.o action.o libsmb.o main.o -o sfm $(LINK)
 
 install:
 	cp -f sfm.cfg $(PATHCONF)
