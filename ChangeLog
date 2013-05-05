@@ -1,3 +1,39 @@
+commit 64bc9ac5550970a77b1a7f1d16ccd577bb830e49
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Sat May 4 21:22:33 2013 -0300
+
+    rearrange appearance, new TODO
+
+commit a09d67ee92145e1fcc8fd55cea5951d08e659e07
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Sat May 4 21:20:35 2013 -0300
+
+    adding support to smb
+
+commit abdac6d52d58b77f8f06776c3688f070e04f9b48
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Sat May 4 21:19:41 2013 -0300
+
+    fixing variables and strings
+
+commit 7f1b3940939ed2ba99725779e8ce16c2635369bd
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Sat May 4 21:07:54 2013 -0300
+
+    make the whole scheme to run desktop default apps on icons when press left button twice
+
+commit 01d2b2c741765c2c69da0488d70b905aab6d8dea
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Fri May 3 00:11:21 2013 -0300
+
+    changes to v0.0.5
+
+commit 897a34172d4086d3b5a49a7f94ccd6ebedbb6a7b
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Thu May 2 22:54:01 2013 -0300
+
+    added some todo things, change readme file
+
 commit 1118c3b2ef2083852292b5c4c9bbc3960630ce76
 Author: Alexandre Mulatinho <alex@mulatinho.net>
 Date:   Thu May 2 22:37:56 2013 -0300
