@@ -140,3 +140,18 @@ int sfm_smb_exec(char *line)
 
 	return 0; 
 }
+
+#ifdef DEBUG
+int main(void) {
+	sfm_smb_exec("list smb://");
+	fprintf(stdout, "\n\n");
+	sfm_smb_exec("list smb://MULATINHO");
+	fprintf(stdout, "\n\n");
+	sfm_smb_exec("list smb://FORREST");
+	fprintf(stdout, "\n\n");
+	sfm_smb_exec("list smb://FORREST/multimedia");
+	fprintf(stdout, "\n\n");
+	sfm_smb_exec("recv smb://FORREST/multimedia/psig-ted.2012.dvdrip.xvid.ac3.srt");
+	return 0;
+}
+#endif
