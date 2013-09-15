@@ -1,6 +1,6 @@
 # Makefile for file manager
-CFLAGS=`pkg-config --cflags gtk+-2.0` -W -Wall -funroll-loops -ggdb -lsmbclient
-LIBS=`pkg-config --libs gtk+-2.0`
+CFLAGS=`pkg-config --cflags gtk+-2.0 smbclient` -W -Wall -funroll-loops -ggdb
+LIBS=`pkg-config --libs gtk+-2.0 smbclient`
 LINK= $(CFLAGS) $(LIBS) -lpthread
 PATHBINR=/usr/local/bin/sfm
 PATHIMGS=/usr/share/pixmaps
@@ -9,7 +9,7 @@ PATHCONF=/etc/sfm.conf
 all: sfm
 	
 strkey.o: strkey.c
-	gcc -o strkey.o -c strkey.c $(CFLAGS)
+	gcc -o strkey.o -c strkey.c $(CFLAGS) 
 
 libsmb.o: libsmb.c
 	gcc -o libsmb.o -c libsmb.c $(CFLAGS)
@@ -24,7 +24,7 @@ main.o: main.c
 	gcc -o main.o -c main.c $(CFLAGS)
 	
 sfm: strkey.o util.o action.o libsmb.o main.o
-	gcc strkey.o util.o action.o libsmb.o main.o -o sfm $(LINK)
+	gcc strkey.o util.o action.o libsmb.o main.o -o sfm $(CFLAGS) $(LIBS)
 
 install:
 	cp -f sfm.cfg $(PATHCONF)
