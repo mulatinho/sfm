@@ -1,3 +1,15 @@
+commit f3b3902790dc21d6ce8a01133677548e8d21f9b5
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Tue Sep 17 00:29:25 2013 -0300
+
+    make changes and prototypes for change views and execute actions
+
+commit e6a5d73359bbae625057f601591dec088383de92
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Tue Sep 17 00:27:37 2013 -0300
+
+    add new prototype code for change file views and preferences
+
 commit 9db0cc72664e400802251c60fb0884f4f092319d
 Author: Alexandre Mulatinho <alex@mulatinho.net>
 Date:   Sun Sep 15 20:18:34 2013 -0300
