@@ -1,3 +1,21 @@
+commit 9db0cc72664e400802251c60fb0884f4f092319d
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Sun Sep 15 20:18:34 2013 -0300
+
+    Fixing Makefile and add '.gitignore' file
+
+commit c577a9cca834a98e64f52c34e4801a9669d1f70c
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Thu May 9 17:00:04 2013 -0300
+
+    Adicionando funcao principal para DEBUG enquanto biblioteca nao esta pronta
+
+commit 3fb2123bf61ed14ad9865a008bf337f28ad063aa
+Author: Alexandre Mulatinho <alex@mulatinho.net>
+Date:   Sat May 4 21:34:10 2013 -0300
+
+    v0.50 okay :)
+
 commit 64bc9ac5550970a77b1a7f1d16ccd577bb830e49
 Author: Alexandre Mulatinho <alex@mulatinho.net>
 Date:   Sat May 4 21:22:33 2013 -0300

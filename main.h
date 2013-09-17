@@ -36,30 +36,37 @@
 #define SFM_CACHE "./sfm/cache" 
 
 void sfm_init(void);
-void sfm_copy_file(void);
-void sfm_cut_file(void);
 void sfm_about(void);
 void sfm_execute(GtkWidget *, GdkEvent *, gpointer);
 void sfm_select_item(GtkWidget *, gint, gint); 
 void sfm_select_menu(GtkWidget *, gint, gint); 
 void sfm_scan_directory(GtkWidget *, char *, int);
 	
+void sfm_run(GtkWidget *, gpointer);
+void sfm_open(GtkWidget *, gpointer);
+void sfm_copy_file(GtkWidget *, gpointer);
+void sfm_paste_file(GtkWidget *, gpointer);
+void sfm_preferences(GtkWidget *, gpointer);
+void sfm_view_list(GtkWidget *, gpointer);
+void sfm_view_icons(GtkWidget *, gpointer);
+void sfm_view_compact(GtkWidget *, gpointer);
+
 static GtkItemFactoryEntry menu_items[] = {
 	{ "/_Arquivo", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/Arquivo/_Abrir", "<control>A", NULL, 0, "<StockItem>", GTK_STOCK_OPEN },
+	{ "/Arquivo/_Abrir", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },
 	{ "/Arquivo/sep1", NULL, NULL, 0, "<Separator>", 0 },
 	{ "/Arquivo/_Sair", "<control>S", gtk_main_quit, 0, "<StockItem>", GTK_STOCK_QUIT },
 	{ "/_Editar", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/Editar/_Executar", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/Editar/_Executar", "<control>E", sfm_run, 0, "<StockItem>", GTK_STOCK_EXECUTE },
 	{ "/Editar/sep1", NULL, NULL, 0, "<Separator>", 0 },
 	{ "/Editar/Copiar", "<control>C", sfm_copy_file, 0, "<StockItem>", GTK_STOCK_COPY },
-	{ "/Editar/Colar", "<control>V", sfm_cut_file, 0, "<StockItem>", GTK_STOCK_CUT },
+	{ "/Editar/Colar", "<control>V", sfm_paste_file, 0, "<StockItem>", GTK_STOCK_CUT },
 	{ "/Editar/sep1", NULL, NULL, 0, "<Separator>", 0 },
-	{ "/Editar/_Preferencias", NULL, sfm_execute, 0, "<StockItem>", GTK_STOCK_PROPERTIES },
+	{ "/Editar/_Preferencias", NULL, sfm_preferences, 0, "<StockItem>", GTK_STOCK_PROPERTIES },
 	{ "/_Visao", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/Visao/_Lista", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Visao/_Icones Pequenos", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Visao/Icones _Grandes", "<control>E", sfm_execute, 0, "<StockItem>", GTK_STOCK_ZOOM_100 },
+	{ "/Visao/_Lista", "<control>E", sfm_view_list, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/Visao/_Compactados", "<control>E", sfm_view_compact, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/Visao/Icones _Grandes", "<control>E", sfm_view_icons, 0, "<StockItem>", GTK_STOCK_ZOOM_100 },
 	{ "/_Sobre", NULL, NULL, 0, "<LastBranch>", 0 },
 	{ "/Sobre/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
