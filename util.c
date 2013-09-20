@@ -21,6 +21,7 @@
 #define MAXFILEZ 512
 #define FILENSIZ NAME_MAX
 
+/*
 char *sfm_bash_exec(char *cmd)
 {
 	FILE *fp;
@@ -45,21 +46,41 @@ char *sfm_bash_exec(char *cmd)
 		return NULL;
 	else
 		return (char*)ret;
-		
-	pthread_exit(NULL);
 }
-void on_executefile(gchar *current_file)
+*/
+
+void sfm_path_new(GtkWidget *wid, GdkEvent *ev, gpointer p)
 {
-	gchar buf[256];
-	pthread_t tid;
+    fprintf(stdout, "sfm_path_new fixme\n");
+}
 
-	memset(buf, '\0', sizeof(buf));
+void sfm_exec_file(gchar *current_file)
+{
+    FILE *fp;
+	gchar inbuf[256], outbuf[256], rbuf[256];
+    gint status = 0, totalbytez = 0;
+	pid_t tid;
 
-	snprintf(buf, sizeof(buf)-1, "xdg-open \"%s\"", current_file);
-	fprintf(stdout, "debug: %s\n", buf);
+	memset(inbuf, '\0', sizeof(inbuf));
+	memset(outbuf, '\0', sizeof(outbuf));
+	memset(rbuf, '\0', sizeof(rbuf));
 
-	pthread_create(&tid, NULL, (void*)sfm_bash_exec, buf);
-	pthread_join(tid, NULL); 
+	g_snprintf(inbuf, sizeof(inbuf)-1, "xdg-open \"%s\"", current_file);
+
+	tid = fork();
+    if (!tid) {
+        if (fp = popen(inbuf, "r")) {
+            while (fgets(rbuf, sizeof(rbuf-1), fp)) {
+                totalbytez+=strlen(rbuf);
+                strncat(outbuf, rbuf, strlen(rbuf)-1);
+	            memset(rbuf, '\0', sizeof(rbuf));
+            }
+            fclose(fp);
+        }
+
+    	waitpid(tid, &status, 0);
+        exit(0);
+    }
 }
 
 GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)

@@ -38,6 +38,7 @@
 void sfm_init(void);
 void sfm_about(void);
 void sfm_execute(GtkWidget *, GdkEvent *, gpointer);
+void sfm_path_new(GtkWidget *, GdkEvent *, gpointer);
 void sfm_select_item(GtkWidget *, gint, gint); 
 void sfm_select_menu(GtkWidget *, gint, gint); 
 void sfm_scan_directory(GtkWidget *, char *, int);

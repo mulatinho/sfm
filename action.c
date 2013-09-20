@@ -161,7 +161,7 @@ void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 		if (S_ISDIR(obj.st_mode))
 			sfm_scan_directory(hbox, sfm_current_path, 1);
 		else 
-			on_executefile(testf);
+			sfm_exec_file(testf);
 		
 		// DEBUG
 		fprintf(stderr, "sfm_current_path: %s -> %s\n", sfm_current_path, p);

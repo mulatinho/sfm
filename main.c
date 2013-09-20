@@ -33,10 +33,10 @@ int main(int argc, char **argv)
 	memset(sfm_current_path, '\0', sizeof(sfm_current_path));
 	snprintf(sfm_current_path, NAME_MAX-1, "%s", getenv("HOME"));
 
-	/* Criação da Janela */
+	/* Criacao da Janela */
 	sfm_win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(sfm_win), PROGNAME);
-	gtk_window_set_default_size(GTK_WINDOW(sfm_win), 800, 460);
+	gtk_window_set_default_size(GTK_WINDOW(sfm_win), 700, 460);
 
 	/* Adicionando um nível vertical */
 	vbox_header = gtk_vbox_new(FALSE, 2);
@@ -114,6 +114,7 @@ int main(int argc, char **argv)
 	gtk_entry_set_text(GTK_ENTRY(entry1), sfm_current_path);
 
 	g_signal_connect(GTK_OBJECT(clist), "select_row", GTK_SIGNAL_FUNC(sfm_select_menu), NULL);
+	g_signal_connect(GTK_OBJECT(entry1), "key-press-event", GTK_SIGNAL_FUNC(sfm_path_new), NULL);
 	g_signal_connect(G_OBJECT(sfm_win), "delete_event", gtk_main_quit, NULL);
 
 	gtk_widget_show_all(sfm_win);
