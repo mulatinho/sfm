@@ -19,11 +19,36 @@
 
 #include "main.h"
 
+void sfm_handle_leftview(GtkWidget *leftview)
+{
+	GtkWidget *label;
+
+    label = gtk_label_new("<b></b>");
+    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
+
+    label = gtk_label_new("<b><a href=\"Home\">Home Directory</a></b>");
+    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
+
+    g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton_home), NULL);
+
+    label = gtk_label_new("<b><a href=\"Samba\">Samba</a> | <a href=\"SSH\">SSH</a> | <a href=\"FTP\">FTP</a></b>");
+    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
+
+    g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton_network), NULL);
+
+    label = gtk_label_new("<b></b>");
+    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
+}
+
 int main(int argc, char **argv)
 {
 	GtkWidget *frame, *vbox_submenu;
 	GtkWidget *menu, *iconwin, *vbox, *fixed, *vbox_header, *vbox_content;
-	GtkWidget *image, *label1, *button;
+	GtkWidget *image, *label1, *label2, *button;
 	GtkItemFactory *item_factory;
 	GtkBox *box;
 	GtkAccelGroup *accel_group;
@@ -73,6 +98,8 @@ int main(int argc, char **argv)
 	vbox_submenu = gtk_vbox_new(FALSE, 4);
 	gtk_box_pack_start(GTK_BOX(hbox), vbox_submenu, FALSE, TRUE, 1);
 	
+    sfm_handle_leftview(vbox_submenu);
+   
 	clist = gtk_clist_new(1);
 	gtk_clist_set_shadow_type(GTK_CLIST(clist), GTK_SHADOW_OUT);
 

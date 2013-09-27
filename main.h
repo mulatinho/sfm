@@ -52,6 +52,11 @@ void sfm_view_list(GtkWidget *, gpointer);
 void sfm_view_icons(GtkWidget *, gpointer);
 void sfm_view_compact(GtkWidget *, gpointer);
 
+void sfm_linkbutton_home(GtkWidget *, const gchar *, gpointer);
+void sfm_linkbutton_network(GtkWidget *, const gchar *, gpointer);
+
+void sfm_handle_leftview(GtkWidget *);
+
 static GtkItemFactoryEntry menu_items[] = {
 	{ "/_Arquivo", NULL, NULL, 0, "<Branch>", 0 },
 	{ "/Arquivo/_Abrir", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },

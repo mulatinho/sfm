@@ -19,6 +19,15 @@
 
 #include "main.h"
 
+void sfm_linkbutton_home(GtkWidget *label, const gchar *uri, gpointer data)
+{
+    fprintf(stdout, "sfm_linkbutton_home\n");
+}
+void sfm_linkbutton_network(GtkWidget *label, const gchar *uri, gpointer data)
+{
+    fprintf(stdout, "sfm_linkbutton_network\n");
+}
+
 void sfm_select_menu(GtkWidget *wid, gint x, gint y) 
 {
 	gchar *text=NULL;
