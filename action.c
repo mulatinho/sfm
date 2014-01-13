@@ -19,10 +19,27 @@
 
 #include "main.h"
 
-void sfm_linkbutton_home(GtkWidget *label, const gchar *uri, gpointer data)
+void sfm_linkbutton(GtkWidget *label, const gchar *uri, gpointer data)
 {
-    fprintf(stdout, "sfm_linkbutton_home\n");
+    gchar buf[NAME_MAX];
+
+    memset(buf, '\0', sizeof(buf));
+    memset(sfm_current_path, '\0', sizeof(sfm_current_path));
+    
+    fprintf(stdout, "label: '%s'\nuri: '%s'\nsfm_linkbutton\n", label, uri);
+
+    if (!strncmp(uri, "Home", strlen(uri))) {
+    	snprintf(sfm_current_path, NAME_MAX-1, "%s", getenv("HOME"));
+		sfm_scan_directory(hbox, sfm_current_path, 1);
+    } else if (!strncmp(uri, "Samba", strlen(uri))) {
+        fprintf(stdout, "sfm_linkbutton -> samba\n");
+    } else if (!strncmp(uri, "SSH", strlen(uri))) {
+        fprintf(stdout, "sfm_linkbutton -> ssh\n");
+    } else if (!strncmp(uri, "FTP", strlen(uri))) {
+        fprintf(stdout, "sfm_linkbutton -> ftp\n");
+    }
 }
+
 void sfm_linkbutton_network(GtkWidget *label, const gchar *uri, gpointer data)
 {
     fprintf(stdout, "sfm_linkbutton_network\n");

@@ -31,13 +31,15 @@ void sfm_handle_leftview(GtkWidget *leftview)
     gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
 	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
 
-    g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton_home), NULL);
+    g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton), NULL);
+
+    // FIXME add personal menus here.
 
     label = gtk_label_new("<b><a href=\"Samba\">Samba</a> | <a href=\"SSH\">SSH</a> | <a href=\"FTP\">FTP</a></b>");
     gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
 	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
 
-    g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton_network), NULL);
+    g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton), NULL);
 
     label = gtk_label_new("<b></b>");
     gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
