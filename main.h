@@ -35,13 +35,38 @@
 #define SFM_CONF "./sfm/sfm.conf" 
 #define SFM_CACHE "./sfm/cache" 
 
+typedef struct {
+    GtkWidget *firstwin;
+
+    GtkWidget *level1, *level2, *level3;
+    
+    GtkWidget *content, *logo;
+    
+    GtkWidget *leftview, *fileview, *menu;
+
+    GtkWidget *leftview_vbox;
+
+    GtkWidget *path_fixed, *path_entry, *path_label;
+
+    GtkWidget *clist, *clist_two;
+    
+    GtkWidget *scroll, *viewport, *fixedright;
+
+    GtkItemFactory *item_factory;
+
+    GtkAccelGroup *accel_group;
+} sfm_t;
+
+sfm_t sfm;
+char sfm_current_path[NAME_MAX];
+
 void sfm_init(void);
 void sfm_about(void);
 void sfm_execute(GtkWidget *, GdkEvent *, gpointer);
 void sfm_path_new(GtkWidget *, GdkEvent *, gpointer);
 void sfm_select_item(GtkWidget *, gint, gint); 
 void sfm_select_menu(GtkWidget *, gint, gint); 
-void sfm_scan_directory(GtkWidget *, char *, int);
+void sfm_scan_directory(int);
 	
 void sfm_run(GtkWidget *, gpointer);
 void sfm_open(GtkWidget *, gpointer);
@@ -51,6 +76,8 @@ void sfm_preferences(GtkWidget *, gpointer);
 void sfm_view_list(GtkWidget *, gpointer);
 void sfm_view_icons(GtkWidget *, gpointer);
 void sfm_view_compact(GtkWidget *, gpointer);
+
+void sfm_warn_message(gchar *, gchar *, gint, gint); 
 
 static GtkItemFactoryEntry menu_items[] = {
 	{ "/_Arquivo", NULL, NULL, 0, "<Branch>", 0 },
@@ -71,13 +98,4 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/_Sobre", NULL, NULL, 0, "<LastBranch>", 0 },
 	{ "/Sobre/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
-
-static int nmenu = sizeof(menu_items) / sizeof(menu_items[0]);
-extern int alphasort();
-char sfm_current_path[NAME_MAX];
-
-GtkWidget *sfm_win, *hbox;
-GtkWidget *clist, *clist_two;
-GtkWidget *scrolled, *viewport, *entry1, *fixedright;
-void warnm(gchar *, gchar *, gint, gint); 
-// void on_executefile(gchar *);
+static int menu_items_n = sizeof(menu_items) / sizeof(menu_items[0]);

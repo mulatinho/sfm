@@ -30,11 +30,11 @@ void sfm_select_menu(GtkWidget *wid, gint x, gint y)
 	fprintf(stderr, "linha: %d. celula: %s\n", x, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
 	
 	if (!x) {
-		sfm_scan_directory(hbox, "/", 1);
+		sfm_scan_directory(1);
 		snprintf(sfm_current_path, NAME_MAX-1, "/");
 	} else if (x == 1) {
 		snprintf(sfm_current_path, NAME_MAX-1, "%s", text);
-		sfm_scan_directory(hbox, sfm_current_path, 1);
+		sfm_scan_directory(1);
 	} else if (x == 2) {
 		snprintf(sfm_current_path, NAME_MAX-1, "smb://");
 		sfm_smb_exec("list smb://");
@@ -42,7 +42,7 @@ void sfm_select_menu(GtkWidget *wid, gint x, gint y)
 		snprintf(sfm_current_path, NAME_MAX-1, "%s", text);
 	}
 
-	gtk_entry_set_text(GTK_ENTRY(entry1), sfm_current_path);
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 }
 
 void do_select(GtkWidget *wid, gint x, gint y) 
@@ -55,7 +55,7 @@ void do_select(GtkWidget *wid, gint x, gint y)
 	memset(filep, '\0', sizeof(filep));
 
 	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
-	fprintf(stderr, "line: %d. cell: %s/%s -> %s\n", x, sfm_current_path, text, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
+	fprintf(stderr, "line: %d. cell: %s/%s . %s\n", x, sfm_current_path, text, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
 
 	if (!strncmp(text,"..",2)) {
 		strcpy(filep, sfm_current_path);
@@ -69,22 +69,22 @@ void do_select(GtkWidget *wid, gint x, gint y)
 		snprintf(filen, NAME_MAX-1, "%s", filep);
 		snprintf(sfm_current_path, NAME_MAX-1, "%s", filen);
 		
-		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filen);
+		fprintf(stderr, "DEBUG: %s . %s\n", sfm_current_path, filen);
 	} else {
 		snprintf(filen, NAME_MAX, "%s/%s", sfm_current_path, text);
 		snprintf(sfm_current_path, NAME_MAX-1, "%s", filen);
-		fprintf(stderr, "DEBUG: %s -> %s\n", sfm_current_path, filen);
+		fprintf(stderr, "DEBUG: %s . %s\n", sfm_current_path, filen);
 	}
 	
 	gtk_clist_clear(GTK_CLIST(wid)); usleep(5);
 	
-	if (wid == clist)
-		list_scanfile(GTK_CLIST(clist_two), sfm_current_path);
+	if (wid == sfm.clist)
+		list_scanfile(GTK_CLIST(sfm.clist_two), sfm_current_path);
 	else
 		fprintf(stdout, "clikei.\n");
 
 	text=NULL;
-	gtk_widget_show_all(sfm_win);
+	gtk_widget_show_all(sfm.firstwin);
 }
 
 void sfm_run(GtkWidget *wid, gpointer p)
@@ -156,15 +156,15 @@ void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 		}
 
 		strcpy(sfm_current_path,filen);
-		gtk_entry_set_text(GTK_ENTRY(entry1), filen);
+		gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), filen);
 
 		if (S_ISDIR(obj.st_mode))
-			sfm_scan_directory(hbox, sfm_current_path, 1);
+			sfm_scan_directory(1);
 		else 
 			sfm_exec_file(testf);
 		
 		// DEBUG
-		fprintf(stderr, "sfm_current_path: %s -> %s\n", sfm_current_path, p);
+		fprintf(stderr, "sfm_current_path: %s . %s\n", sfm_current_path, p);
 
 	}
 }

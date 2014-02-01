@@ -69,7 +69,7 @@ void sfm_exec_file(gchar *current_file)
 
 	tid = fork();
     if (!tid) {
-        if (fp = popen(inbuf, "r")) {
+        if ((fp = popen(inbuf, "r"))) {
             while (fgets(rbuf, sizeof(rbuf-1), fp)) {
                 totalbytez+=strlen(rbuf);
                 strncat(outbuf, rbuf, strlen(rbuf)-1);
@@ -113,10 +113,12 @@ GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
 	gtk_fixed_put(GTK_FIXED(box), vbox, x, y);
 
 	g_signal_connect(GTK_OBJECT(eventbox), "button_press_event", G_CALLBACK(sfm_execute), file);
+
 	return vbox;
 }
 
-void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
+extern int alphasort();
+void sfm_scan_directory(int hidden)
 {
 	struct dirent **files;
 	struct stat obj;
@@ -127,35 +129,53 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 	memset(filen, '\0', NAME_MAX);
 	memset(iconname, '\0', NAME_MAX);
 
-	gtk_widget_destroy(fixedright);
-	gtk_widget_destroy(viewport);
-	gtk_widget_destroy(scrolled);
+	if (sfm.viewport)
+	    gtk_widget_destroy(sfm.viewport);
 
-	scrolled = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_shadow_type((GtkScrolledWindow*)scrolled, GTK_SHADOW_NONE);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled),
+	if (sfm.scroll)
+	    gtk_widget_destroy(sfm.scroll);
+
+	if (sfm.fixedright)
+	    gtk_widget_destroy(sfm.fixedright);
+
+	if (sfm.fileview)
+	    gtk_widget_destroy(sfm.fileview);
+
+	sfm.fileview = gtk_hbox_new(FALSE, 4);
+	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
+
+	sfm.scroll = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_shadow_type((GtkScrolledWindow*)sfm.scroll, GTK_SHADOW_NONE);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sfm.scroll),
 		GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-	fixedright = gtk_fixed_new();
-	viewport = gtk_viewport_new(NULL,NULL);
-	gtk_viewport_set_shadow_type((GtkViewport*)viewport, GTK_SHADOW_NONE);
-	gtk_box_pack_start(GTK_BOX(wid), scrolled, TRUE, TRUE, 2);
-	gtk_container_add(GTK_CONTAINER(scrolled), viewport);
-	gtk_container_add(GTK_CONTAINER(viewport), fixedright);
 
-	xstat = scandir(work_path, &files, 0, alphasort);
+	sfm.fixedright = gtk_fixed_new();
+
+	sfm.viewport = gtk_viewport_new(NULL,NULL);
+	gtk_viewport_set_shadow_type((GtkViewport*)sfm.viewport, GTK_SHADOW_NONE);
+
+    gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
+	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.viewport);
+
+	gtk_container_add(GTK_CONTAINER(sfm.viewport), sfm.fixedright);
+
+	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
+
+	xstat = scandir(sfm_current_path, &files, 0, alphasort);
 	
-	y = 10;
-	for (loop=0,z=1; loop<xstat; loop++) {
-		utf8 = g_locale_to_utf8(files[loop]->d_name, strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, NAME_MAX, "%s/%s",work_path,utf8);
+	for (loop=0,z=1,y=10; loop<xstat; loop++) 
+    {
+		utf8 = g_locale_to_utf8(files[loop]->d_name, 
+                strlen(files[loop]->d_name), NULL, NULL, NULL);
+		snprintf(filen, NAME_MAX, "%s/%s",sfm_current_path,utf8);
 
 		lstat(filen, &obj);
 		
-		/* Numero de colunas */
+		/* Icon Y Axis */
 		if (!(z % 4))
 			y += 140;
 
-		/* Tamanho de cada area/icone */
+		/* Icon X Axis */
 		x = (z%4) * 120;
 
 		for (r=0,t=0;t<=strlen(utf8);t++) {
@@ -169,10 +189,10 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 		}
 		
 		if (!hidden)
-			create_icone(fixedright, (char*)iconname, (char*)utf8, x, y);
+			create_icone(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
 		else {
 			if ((utf8[0] == '.' && utf8[1] == '.') || utf8[0] != '.')
-				create_icone(fixedright, (char*)iconname, (char*)utf8, x, y);
+				create_icone(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
 			else
 				z--;
 		}
@@ -180,11 +200,12 @@ void sfm_scan_directory(GtkWidget *wid, char *work_path, int hidden)
 		memset(filen, '\0', NAME_MAX); z++;
 	}
 
-	gtk_widget_show_all(hbox);
+	gtk_widget_show_all(sfm.firstwin);
+
 	return;
 }
 
-void list_scanfile(GtkCList *clist, char *worksfm_current_path, int hidden)
+void list_scanfile(GtkCList *clist, int hidden)
 {
 	struct dirent **files;
 	struct stat obj;
@@ -192,12 +213,13 @@ void list_scanfile(GtkCList *clist, char *worksfm_current_path, int hidden)
 	int loop, xstat, x, z;
 	char filen[NAME_MAX];
 
-	xstat = scandir(worksfm_current_path, &files, 0, alphasort);
+	xstat = scandir(sfm_current_path, &files, 0, alphasort);
 	text = malloc(xstat*FILENSIZ);
 	
 	for (loop=0,x=0; loop<xstat; loop++) {
-		utf8 = g_locale_to_utf8(files[loop]->d_name, strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, NAME_MAX, "%s/%s",worksfm_current_path,utf8);
+		utf8 = g_locale_to_utf8(files[loop]->d_name, 
+                strlen(files[loop]->d_name), NULL, NULL, NULL);
+		snprintf(filen, NAME_MAX-1, "%s/%s",sfm_current_path,utf8);
 
 		lstat(filen, &obj);
 			
@@ -217,20 +239,22 @@ void list_scanfile(GtkCList *clist, char *worksfm_current_path, int hidden)
 		gtk_clist_append(clist, (char**)&text[loop]);
 
 	free(text);
+
 	return;
 }
 
-void warnm(gchar *title, gchar *message, gint x, gint y)
+void sfm_warn_message(gchar *title, gchar *message, gint width, gint height)
 {
        GtkWidget *dialog, *label; 
          
-       dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm_win), GTK_DIALOG_DESTROY_WITH_PARENT,
-               GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
-	   gtk_widget_set_usize(dialog, x, y);
+       dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm.firstwin), 
+         GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
+	   gtk_widget_set_usize(dialog, width, height);
          
        label = gtk_label_new (message);
        
-       g_signal_connect_swapped (dialog, "response", G_CALLBACK (gtk_widget_destroy), dialog);
+       g_signal_connect_swapped (dialog, "response", 
+         G_CALLBACK (gtk_widget_destroy), dialog);
 
        gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label); 
        gtk_widget_show_all (dialog);
