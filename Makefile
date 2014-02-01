@@ -9,25 +9,31 @@ PATHCONF=/etc/sfm.conf
 all: sfm
 	
 strkey.o: strkey.c
-	gcc -o strkey.o -c strkey.c $(CFLAGS) 
+	clang -o strkey.o -c strkey.c $(CFLAGS) 
 
 libsmb.o: libsmb.c
-	gcc -o libsmb.o -c libsmb.c $(CFLAGS)
+	clang -o libsmb.o -c libsmb.c $(CFLAGS)
 
 action.o: action.c
-	gcc -o action.o -c action.c $(CFLAGS)
+	clang -o action.o -c action.c $(CFLAGS)
 	
 util.o: util.c
-	gcc -o util.o -c util.c $(CFLAGS)
+	clang -o util.o -c util.c $(CFLAGS)
 	
 views.o: views.c
-	gcc -o views.o -c views.c $(CFLAGS)
+	clang -o views.o -c views.c $(CFLAGS)
+
+test.o: test.c
+	clang -o test.o -c test.c $(CFLAGS)
 
 main.o: main.c
-	gcc -o main.o -c main.c $(CFLAGS)
+	clang -o main.o -c main.c $(CFLAGS)
 	
 sfm: strkey.o util.o views.o action.o libsmb.o main.o
-	gcc strkey.o util.o views.o action.o libsmb.o main.o -o sfm $(CFLAGS) $(LIBS)
+	clang strkey.o util.o views.o action.o libsmb.o main.o -o sfm $(CFLAGS) $(LIBS)
+
+test: test.o test.o
+	clang test.o -o test $(CFLAGS) $(LIBS)
 
 install:
 	cp -f sfm.cfg $(PATHCONF)

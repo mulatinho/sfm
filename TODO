@@ -1,13 +1,30 @@
 * SFM CORE
+  
   Support for two new file systems: FTP and SSH
+  
   Support for put remote files in SMB with libsmbclient
-  Adicionar suporte a modificação dos principais MIMEs - ~/.local/share/applications/mimeapps.list
+
+  Support to integrate with D-BUS and XOrg defaults
+  - ~/.local/share/applications/mimeapps.list
+  - ~/.local/share/apps
+
+  Put a statusbar in the last line;
+
+  Define if we need fix window size or rearrange her dinamically.
+
+  Support for HotPlug USB Pendrives, HardDisks, ETC.
+
 
 * SFM GUI
-  - Rearrange the main left menu.
-  - Set the action for menu items with right mouse click.
-
-* SFM VIEWLIST
-- view in a list
-- view in a compact mode
-- view like icons
+  
+  - Branch 'leftview'
+    - Rearrange the main left menu. 
+    - Add support for users put new shortcut labels
+  
+  - Branch 'views'
+    - Set the action for menu items with right mouse click.
+    - Add support for gtk_iconview.
+    - Add support for list files in a tree view.
+    - Add support for view in compact mode
+  
+  - Choice better icons from a free software library
