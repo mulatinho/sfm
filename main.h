@@ -38,11 +38,11 @@
 typedef struct {
     GtkWidget *firstwin;
 
-    GtkWidget *level1, *level2, *level3;
+    GtkWidget *level1, *level2, *level3, *level4;
     
-    GtkWidget *content, *logo;
+    GtkWidget *content, *leftview, *fileview;
     
-    GtkWidget *leftview, *fileview, *menu;
+    GtkWidget *menu, *logo;
 
     GtkWidget *leftview_vbox;
 
