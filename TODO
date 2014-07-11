@@ -1,10 +1,13 @@
 * SFM CORE
-  
+ 
+  Support for LDAP browsing.
+        
   Support for two new file systems: FTP and SSH
   
   Support for put remote files in SMB with libsmbclient
 
   Support to integrate with D-BUS and XOrg defaults
+  - http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
   - ~/.local/share/applications/mimeapps.list
   - ~/.local/share/apps
 
