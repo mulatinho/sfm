@@ -13,13 +13,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 char *strkey(char *buf, int who, short del)
 {
 	char *str = (char*)malloc(strlen(buf));
 	short ch, i, f=0, x=0, loop=0;
 
-	for (i=0;i<strlen(buf);i++) {
+	for (i=0;i<(short)strlen(buf);i++) {
 	ch = *(buf+i);
 
 	if (ch==del && !i && !who)
