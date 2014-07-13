@@ -22,6 +22,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -42,7 +43,7 @@ typedef struct {
 	
 	GtkWidget *content, *leftview, *fileview;
 	
-	GtkWidget *menu, *logo;
+	GtkWidget *menu, *logo, *statusbar;
 
 	GtkWidget *leftview_vbox;
 
@@ -77,9 +78,9 @@ void sfm_view_list(GtkWidget *, gpointer);
 void sfm_view_icons(GtkWidget *, gpointer);
 void sfm_view_compact(GtkWidget *, gpointer);
 
-void sfm_linkbutton(GtkWidget *, const gchar *, gpointer);
-void sfm_linkbutton_home(GtkWidget *, const gchar *, gpointer);
-void sfm_linkbutton_network(GtkWidget *, const gchar *, gpointer);
+void sfm_link_event(GtkWidget *, const gchar *, gpointer);
+void sfm_link_home(GtkWidget *, const gchar *, gpointer);
+void sfm_link_network(GtkWidget *, const gchar *, gpointer);
 
 void sfm_handle_leftview(GtkWidget *);
 void sfm_warn_message(gchar *, gchar *, gint, gint); 

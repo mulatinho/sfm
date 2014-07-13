@@ -31,7 +31,7 @@ void sfm_handle_leftview(GtkWidget *leftview)
 	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
 	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
 
-	g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton), NULL);
+	//g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_link_event), NULL);
 
 	// FIXME add personal menus here.
 
@@ -39,7 +39,7 @@ void sfm_handle_leftview(GtkWidget *leftview)
 	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
 	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
 
-	g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_linkbutton), NULL);
+	g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_link_event), NULL);
 
 	if (!sfm_has_shortcuts()) {
 		label = gtk_label_new("<b>Shortcuts</b>");
@@ -103,19 +103,19 @@ int main(int argc, char **argv)
 
 	text = malloc(NAME_MAX * 5); // NAME_MAX chars, 5 lines
 	
-	snprintf(buf, NAME_MAX-1, "raiz: /\0");
+	snprintf(buf, NAME_MAX-1, "raiz: /");
 	text[0] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[0]);
 	
 	text[1] = getenv("HOME");
-	snprintf(buf, NAME_MAX-1, "home: %s\0", text[1]);
+	snprintf(buf, NAME_MAX-1, "home: %s", text[1]);
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[1]);
 	
-	snprintf(buf, NAME_MAX-1, "smb://host/dir\0");
+	snprintf(buf, NAME_MAX-1, "smb://host/dir");
 	text[2] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[2]);
 	
-	snprintf(buf, NAME_MAX-1, "ssh://user@host\0");
+	snprintf(buf, NAME_MAX-1, "ssh://user@host");
 	text[3] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[3]);
 	
@@ -124,9 +124,14 @@ int main(int argc, char **argv)
 	
 	free(text);
 
-	snprintf(buf, NAME_MAX-1, "%s/sfm.png\0", SFM_IMAGES);
+	snprintf(buf, NAME_MAX-1, "%s/sfm.png", SFM_IMAGES);
 	sfm.logo = gtk_image_new_from_file(buf);
 	gtk_box_pack_start(GTK_BOX(sfm.level3), sfm.logo, FALSE, TRUE, 1);
+
+	sfm.level4 = gtk_vbox_new(2, TRUE);
+	sfm.statusbar = gtk_statusbar_new();
+	gtk_box_pack_start(GTK_BOX(sfm.level4), sfm.statusbar, FALSE, TRUE, 1);
+	gtk_box_pack_start(GTK_BOX(sfm.level2), sfm.level4, FALSE, TRUE, 1);
 
 	sfm_scan_directory(1);
 	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
