@@ -1,51 +1,51 @@
-//      action.c
-//      
-//      Copyright 2010 Alexandre Mulatinho <alex@mulatinho.net>
-//      
-//      This program is free software; you can redistribute it and/or modify
-//      it under the terms of the GNU General Public License as published by
-//      the Free Software Foundation; either version 2 of the License, or
-//      (at your option) any later version.
-//      
-//      This program is distributed in the hope that it will be useful,
-//      but WITHOUT ANY WARRANTY; without even the implied warranty of
-//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//      GNU General Public License for more details.
-//      
-//      You should have received a copy of the GNU General Public License
-//      along with this program; if not, write to the Free Software
-//      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-//      MA 02110-1301, USA.
+//	action.c
+//		
+//	Copyright 2010 Alexandre Mulatinho <alex@mulatinho.net>
+//	
+//	This program is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published by
+//	the Free Software Foundation; either version 2 of the License, or
+//	(at your option) any later version.
+//	
+//	This program is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+//	GNU General Public License for more details.
+//		
+//	You should have received a copy of the GNU General Public License
+//	along with this program; if not, write to the Free Software
+//	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+//	MA 02110-1301, USA.
 
 #include "main.h"
 
 void sfm_linkbutton(GtkWidget *label, const gchar *uri, gpointer data)
 {
-    gchar buf[NAME_MAX];
+	gchar buf[NAME_MAX];
 
-    memset(buf, '\0', sizeof(buf));
-    memset(sfm_current_path, '\0', sizeof(sfm_current_path));
-    
-    fprintf(stdout, "label: '%s'\nuri: '%s'\nsfm_linkbutton\n", label, uri);
-
-    if (!strncmp(uri, "Home", strlen(uri))) {
-        memset(sfm_current_path, '\0', sizeof(sfm_current_path)-1);
-    	snprintf(sfm_current_path, NAME_MAX-1, "%s", getenv("HOME"));
-		sfm_scan_directory(1);
-    } else if (!strncmp(uri, "Samba", strlen(uri))) {
-        fprintf(stdout, "sfm_linkbutton -> samba\n");
-    } else if (!strncmp(uri, "SSH", strlen(uri))) {
-        fprintf(stdout, "sfm_linkbutton -> ssh\n");
-    } else if (!strncmp(uri, "FTP", strlen(uri))) {
-        fprintf(stdout, "sfm_linkbutton -> ftp\n");
-    }
+	memset(buf, '\0', sizeof(buf));
+	memset(sfm_current_path, '\0', sizeof(sfm_current_path));
 	
-    gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
+	fprintf(stdout, "label: '%s'\nuri: '%s'\nsfm_linkbutton\n", label, uri);
+
+	if (!strncmp(uri, "Home", strlen(uri))) {
+		memset(sfm_current_path, '\0', sizeof(sfm_current_path)-1);
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", getenv("HOME"));
+		sfm_scan_directory(1);
+	} else if (!strncmp(uri, "Samba", strlen(uri))) {
+		fprintf(stdout, "sfm_linkbutton -> samba\n");
+	} else if (!strncmp(uri, "SSH", strlen(uri))) {
+		fprintf(stdout, "sfm_linkbutton -> ssh\n");
+	} else if (!strncmp(uri, "FTP", strlen(uri))) {
+		fprintf(stdout, "sfm_linkbutton -> ftp\n");
+	}
+	
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 }
 
 void sfm_linkbutton_network(GtkWidget *label, const gchar *uri, gpointer data)
 {
-    fprintf(stdout, "sfm_linkbutton_network\n");
+	fprintf(stdout, "sfm_linkbutton_network\n");
 }
 
 void sfm_select_menu(GtkWidget *wid, gint x, gint y) 
@@ -130,23 +130,23 @@ void sfm_copy_file(GtkWidget *wid, gpointer p)
 
 void sfm_open(GtkWidget *wid, gpointer p)
 {
-    GtkWidget *dialog;
-    
-    dialog = gtk_file_chooser_dialog_new ("Selecione arquivo.",           
-        wid, GTK_FILE_CHOOSER_ACTION_OPEN,
-        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-        GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-     
-    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-    {
-        char *filename;
-     
-        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-        //fixme: open file
-        g_free (filename);
-    }
-     
-    gtk_widget_destroy (dialog); 
+	GtkWidget *dialog;
+	
+	dialog = gtk_file_chooser_dialog_new ("Selecione arquivo.",		 
+	wid, GTK_FILE_CHOOSER_ACTION_OPEN,
+	GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+	GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+	 
+	if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		char *filename;
+	 
+		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		//fixme: open file
+		g_free (filename);
+	}
+	 
+	gtk_widget_destroy (dialog); 
 }
 
 void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)

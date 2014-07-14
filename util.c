@@ -1,21 +1,21 @@
-//      util.c
-//      
-//      Copyright 2010 Alexandre Mulatinho <alex@mulatinho.net>
-//      
-//      This program is free software; you can redistribute it and/or modify
-//      it under the terms of the GNU General Public License as published by
-//      the Free Software Foundation; either version 2 of the License, or
-//      (at your option) any later version.
-//      
-//      This program is distributed in the hope that it will be useful,
-//      but WITHOUT ANY WARRANTY; without even the implied warranty of
-//      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//      GNU General Public License for more details.
-//      
-//      You should have received a copy of the GNU General Public License
-//      along with this program; if not, write to the Free Software
-//      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-//      MA 02110-1301, USA.
+//	util.c
+//		
+//	Copyright 2010 Alexandre Mulatinho <alex@mulatinho.net>
+//		
+//	This program is free software; you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published by
+//	the Free Software Foundation; either version 2 of the License, or
+//	(at your option) any later version.
+//		
+//	This program is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+//	GNU General Public License for more details.
+//	
+//	You should have received a copy of the GNU General Public License
+//	along with this program; if not, write to the Free Software
+//	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+//	MA 02110-1301, USA.
 
 #include "main.h"
 #define MAXFILEZ 512
@@ -49,16 +49,22 @@ char *sfm_bash_exec(char *cmd)
 }
 */
 
+int sfm_has_shortcuts(void)
+{
+	// FIXME: Do the things here.
+	return 0;
+}
+
 void sfm_path_new(GtkWidget *wid, GdkEvent *ev, gpointer p)
 {
-    fprintf(stdout, "sfm_path_new fixme\n");
+	fprintf(stdout, "sfm_path_new fixme\n");
 }
 
 void sfm_exec_file(gchar *current_file)
 {
-    FILE *fp;
+	FILE *fp;
 	gchar inbuf[256], outbuf[256], rbuf[256];
-    gint status = 0, totalbytez = 0;
+	gint status = 0, totalbytez = 0;
 	pid_t tid;
 
 	memset(inbuf, '\0', sizeof(inbuf));
@@ -68,19 +74,19 @@ void sfm_exec_file(gchar *current_file)
 	g_snprintf(inbuf, sizeof(inbuf)-1, "xdg-open \"%s\"", current_file);
 
 	tid = fork();
-    if (!tid) {
-        if ((fp = popen(inbuf, "r"))) {
-            while (fgets(rbuf, sizeof(rbuf-1), fp)) {
-                totalbytez+=strlen(rbuf);
-                strncat(outbuf, rbuf, strlen(rbuf)-1);
-	            memset(rbuf, '\0', sizeof(rbuf));
-            }
-            fclose(fp);
-        }
+	if (!tid) {
+		if ((fp = popen(inbuf, "r"))) {
+			while (fgets(rbuf, sizeof(rbuf-1), fp)) {
+				totalbytez+=strlen(rbuf);
+				strncat(outbuf, rbuf, strlen(rbuf)-1);
+				memset(rbuf, '\0', sizeof(rbuf));
+			}
+			fclose(fp);
+		}
 
-    	waitpid(tid, &status, 0);
-        exit(0);
-    }
+		waitpid(tid, &status, 0);
+		exit(0);
+	}
 }
 
 GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
@@ -130,16 +136,16 @@ void sfm_scan_directory(int hidden)
 	memset(iconname, '\0', NAME_MAX);
 
 	if (sfm.viewport)
-	    gtk_widget_destroy(sfm.viewport);
+		gtk_widget_destroy(sfm.viewport);
 
 	if (sfm.scroll)
-	    gtk_widget_destroy(sfm.scroll);
+		gtk_widget_destroy(sfm.scroll);
 
 	if (sfm.fixedright)
-	    gtk_widget_destroy(sfm.fixedright);
+		gtk_widget_destroy(sfm.fixedright);
 
 	if (sfm.fileview)
-	    gtk_widget_destroy(sfm.fileview);
+		gtk_widget_destroy(sfm.fileview);
 
 	sfm.fileview = gtk_hbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
@@ -154,7 +160,7 @@ void sfm_scan_directory(int hidden)
 	sfm.viewport = gtk_viewport_new(NULL,NULL);
 	gtk_viewport_set_shadow_type((GtkViewport*)sfm.viewport, GTK_SHADOW_NONE);
 
-    gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
+	gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
 	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.viewport);
 
 	gtk_container_add(GTK_CONTAINER(sfm.viewport), sfm.fixedright);
@@ -164,9 +170,9 @@ void sfm_scan_directory(int hidden)
 	xstat = scandir(sfm_current_path, &files, 0, alphasort);
 	
 	for (loop=0,z=1,y=10; loop<xstat; loop++) 
-    {
+	{
 		utf8 = g_locale_to_utf8(files[loop]->d_name, 
-                strlen(files[loop]->d_name), NULL, NULL, NULL);
+		strlen(files[loop]->d_name), NULL, NULL, NULL);
 		snprintf(filen, NAME_MAX, "%s/%s",sfm_current_path,utf8);
 
 		lstat(filen, &obj);
@@ -218,7 +224,7 @@ void list_scanfile(GtkCList *clist, int hidden)
 	
 	for (loop=0,x=0; loop<xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, 
-                strlen(files[loop]->d_name), NULL, NULL, NULL);
+		strlen(files[loop]->d_name), NULL, NULL, NULL);
 		snprintf(filen, NAME_MAX-1, "%s/%s",sfm_current_path,utf8);
 
 		lstat(filen, &obj);
@@ -245,17 +251,17 @@ void list_scanfile(GtkCList *clist, int hidden)
 
 void sfm_warn_message(gchar *title, gchar *message, gint width, gint height)
 {
-       GtkWidget *dialog, *label; 
-         
-       dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm.firstwin), 
-         GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
-	   gtk_widget_set_usize(dialog, width, height);
-         
-       label = gtk_label_new (message);
-       
-       g_signal_connect_swapped (dialog, "response", 
-         G_CALLBACK (gtk_widget_destroy), dialog);
+	 GtkWidget *dialog, *label; 
+	 
+	 dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm.firstwin), 
+	 GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
+	 gtk_widget_set_usize(dialog, width, height);
+	 
+	 label = gtk_label_new (message);
+		 
+	 g_signal_connect_swapped (dialog, "response", 
+	 G_CALLBACK (gtk_widget_destroy), dialog);
 
-       gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label); 
-       gtk_widget_show_all (dialog);
+	 gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label); 
+	 gtk_widget_show_all (dialog);
 }
