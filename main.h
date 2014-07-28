@@ -17,6 +17,10 @@
 //	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 //	MA 02110-1301, USA.
 
+#ifndef _SFM_CORE_H_
+#define _SFM_CORE_H_
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,6 +39,10 @@
 #define SFM_IMAGES "./picz"
 #define SFM_CONF "./sfm/sfm.conf" 
 #define SFM_CACHE "./sfm/cache" 
+
+#define ICON_SZ_S 16
+#define ICON_SZ_M 32
+#define ICON_SZ_L 130
 
 typedef struct {
 	GtkWidget *firstwin;
