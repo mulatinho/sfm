@@ -89,7 +89,7 @@ void sfm_exec_file(gchar *current_file)
 	}
 }
 
-GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
+GtkWidget *sfm_create_icon(GtkWidget *box, gchar *label, gchar *file, int x, int y)
 {
 	GtkWidget *vbox, *image, *label1, *eventbox;
 	gchar buf[FILENSIZ], filen[FILENSIZ];
@@ -101,12 +101,14 @@ GtkWidget *create_icone(GtkWidget *box, gchar *label, gchar *file, int x, int y)
 	lstat(filen, &obj);
 
 	if (S_ISDIR(obj.st_mode)) 
-		snprintf(buf, FILENSIZ-1, "%s/sfmfolder.png", SFM_IMAGES);
+		image = gtk_image_new_from_stock(GTK_STOCK_DIRECTORY, 
+			GTK_ICON_SIZE_DIALOG);
+		/* snprintf(buf, FILENSIZ-1, "%s/sfmfolder.png", SFM_IMAGES); */
 	else 
-		snprintf(buf, FILENSIZ-1, "%s/sfmfile.png", SFM_IMAGES);
+		image = gtk_image_new_from_stock(GTK_STOCK_FILE,
+			GTK_ICON_SIZE_DIALOG);
+		/* snprintf(buf, FILENSIZ-1, "%s/sfmfile.png", SFM_IMAGES); */
 	
-	image = gtk_image_new_from_file(buf);
-
 	label1 = gtk_label_new(label);
 	gtk_widget_set_usize(GTK_WIDGET(label1), 125, 80);
 	gtk_label_set_justify(GTK_LABEL(label1), GTK_JUSTIFY_CENTER);
@@ -129,11 +131,20 @@ void sfm_scan_directory(int hidden)
 	struct dirent **files;
 	struct stat obj;
 	char *utf8;
-	int loop, xstat, x, y, z, t, r;
-	char iconname[256], filen[256];
+	int loop, xstat, x, y, filen, t, r;
+	int hsize, wsize;
+	char iconname[256], filename[256];
+	GdkScreen *screen;
 
-	memset(filen, '\0', NAME_MAX);
+	memset(filename, '\0', NAME_MAX);
 	memset(iconname, '\0', NAME_MAX);
+
+	screen = gtk_widget_get_screen(sfm.fixedright);
+
+	hsize = gdk_screen_get_height(screen);
+	wsize = gdk_screen_get_width(screen);
+
+	fprintf(stdout, "hsize: %d, wsize: %d\n", hsize, wsize);
 
 	if (sfm.viewport)
 		gtk_widget_destroy(sfm.viewport);
@@ -169,23 +180,23 @@ void sfm_scan_directory(int hidden)
 
 	xstat = scandir(sfm_current_path, &files, 0, alphasort);
 	
-	for (loop=0,z=1,y=10; loop<xstat; loop++) 
-	{
+	filen = 1;
+	for (loop = 0, y = 10; loop < xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, 
 		strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, NAME_MAX, "%s/%s",sfm_current_path,utf8);
+		snprintf(filename, NAME_MAX, "%s/%s", sfm_current_path, utf8);
 
-		lstat(filen, &obj);
+		lstat(filename, &obj);
 		
 		/* Icon Y Axis */
-		if (!(z % 4))
-			y += 140;
+		if (!(filen % 4))
+			y += ICON_SZ_L;
 
 		/* Icon X Axis */
-		x = (z%4) * 120;
+		x = (filen % 4) * ICON_SZ_L;
 
-		for (r=0,t=0;t<=strlen(utf8);t++) {
-			if (!(t%11) && t!=0) {
+		for (r = 0, t = 0; t <= strlen(utf8); t++) {
+			if (!(t % ICON_SZ_S) && t != 0) {
 				iconname[r] = '\n';
 				r++;
 			}
@@ -195,56 +206,19 @@ void sfm_scan_directory(int hidden)
 		}
 		
 		if (!hidden)
-			create_icone(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
+			sfm_create_icon(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
 		else {
 			if ((utf8[0] == '.' && utf8[1] == '.') || utf8[0] != '.')
-				create_icone(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
+				sfm_create_icon(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
 			else
-				z--;
+				filen--;
 		}
 
-		memset(filen, '\0', NAME_MAX); z++;
+		memset(filename, '\0', NAME_MAX);
+		filen++;
 	}
 
 	gtk_widget_show_all(sfm.firstwin);
-
-	return;
-}
-
-void list_scanfile(GtkCList *clist, int hidden)
-{
-	struct dirent **files;
-	struct stat obj;
-	char **text, *utf8;
-	int loop, xstat, x, z;
-	char filen[NAME_MAX];
-
-	xstat = scandir(sfm_current_path, &files, 0, alphasort);
-	text = malloc(xstat*FILENSIZ);
-	
-	for (loop=0,x=0; loop<xstat; loop++) {
-		utf8 = g_locale_to_utf8(files[loop]->d_name, 
-		strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filen, NAME_MAX-1, "%s/%s",sfm_current_path,utf8);
-
-		lstat(filen, &obj);
-			
-		if (!hidden)
-			text[x] = utf8;
-		else {
-			if (utf8[0] != '.' && (utf8[1] != '\0' || utf8[1] != '.')) 
-				text[x] = utf8;
-			else
-				x--;
-		}
-
-		memset(filen, '\0', NAME_MAX); x++;
-	}
-
-	for (loop=0; loop<x; loop++)
-		gtk_clist_append(clist, (char**)&text[loop]);
-
-	free(text);
 
 	return;
 }
