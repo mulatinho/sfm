@@ -1,33 +1,40 @@
 * SFM CORE
+************
  
+  Support for GPG, LUKS.
+
   Support for LDAP browsing.
         
-  Support for two new file systems: FTP and SSH
-  
-  Support for put remote files in SMB with libsmbclient
+  Support for new protocols: SMB, FTP and SCP
+  - libnetwork
+    - libsmb.c, libftp.c, libssh.c 
+      .. Support for send, recv remote files in SMB .. OK
+    - Integrate with views. 
+
 
   Support to integrate with D-BUS and XOrg defaults
   - http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
   - ~/.local/share/applications/mimeapps.list
   - ~/.local/share/apps
 
-  Put a statusbar in the last line;
+  Update statusbar with util informations about file;
 
   Define if we need fix window size or rearrange her dinamically.
 
   Support for HotPlug USB Pendrives, HardDisks, ETC.
 
 
-* SFM GUI
-  
-  - Branch 'leftview'
+  Left View
     - Rearrange the main left menu. 
     - Add support for users put new shortcut labels
   
-  - Branch 'views'
-    - Set the action for menu items with right mouse click.
-    - Add support for gtk_iconview.
-    - Add support for list files in a tree view.
-    - Add support for view in compact mode
+  Views
+    - Left View
+      .. Rearrange the main left menu. 
+      .. Add support for users put new shortcut labels
+    - Right View
+      .. Set the action for menu items with right mouse click.
+      .. Add support for list files in a tree view.
+      .. Add support for view in compact mode
   
-  - Choice better icons from a free software library
+  - Choice better icons from a free software library?
