@@ -19,7 +19,12 @@
 
 #include "main.h"
 
-void sfm_linkbutton(GtkWidget *label, const gchar *uri, gpointer data)
+
+void sfm_create_shortcut(GtkWidget *wid, gchar *label);
+void sfm_create_shortcut(GtkWidget *wid, gchar *label);
+void sfm_create_shortcut(GtkWidget *wid, gchar *label);
+
+void sfm_link_event(GtkWidget *label, const gchar *uri, gpointer data)
 {
 	gchar buf[NAME_MAX];
 
@@ -43,7 +48,7 @@ void sfm_linkbutton(GtkWidget *label, const gchar *uri, gpointer data)
 	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 }
 
-void sfm_linkbutton_network(GtkWidget *label, const gchar *uri, gpointer data)
+void sfm_link_network(GtkWidget *label, const gchar *uri, gpointer data)
 {
 	fprintf(stdout, "sfm_linkbutton_network\n");
 }
@@ -107,10 +112,7 @@ void do_select(GtkWidget *wid, gint x, gint y)
 	
 	gtk_clist_clear(GTK_CLIST(wid)); usleep(5);
 	
-	if (wid == sfm.clist)
-		list_scanfile(GTK_CLIST(sfm.clist_two), sfm_current_path);
-	else
-		fprintf(stdout, "clikei.\n");
+	fprintf(stdout, "clikei.\n");
 
 	text=NULL;
 	gtk_widget_show_all(sfm.firstwin);
@@ -151,6 +153,7 @@ void sfm_open(GtkWidget *wid, gpointer p)
 
 void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 {
+	GdkColor color = {0, 0xffff, 0xffff, 0xffaa};
 	gchar filen[NAME_MAX], testf[NAME_MAX];
 	struct stat obj;
 	int i;
@@ -160,7 +163,12 @@ void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 	
 	fprintf(stderr, "==> %d\n", event->type);
 
-	if (event->type==5) {
+	switch (event->type) {
+	case GDK_BUTTON_PRESS:
+		gtk_widget_modify_bg(wid, GTK_STATE_SELECTED, &color);
+		break;
+
+	case GDK_2BUTTON_PRESS:
 		if (!strcmp(p, "..")) {
 			for (i=strlen(sfm_current_path);i!=0;i--) {
 				if (sfm_current_path[i] == '/') {
@@ -194,6 +202,7 @@ void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 		
 		// DEBUG
 		fprintf(stderr, "sfm_current_path: %s . %s\n", sfm_current_path, p);
+		break;
 
 	}
 }
