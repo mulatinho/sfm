@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 	/* principal window */
 	sfm.firstwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(sfm.firstwin), PROGNAME);
-	gtk_window_set_default_size(GTK_WINDOW(sfm.firstwin), 700, 460);
+	gtk_window_set_default_size(GTK_WINDOW(sfm.firstwin), 800, 600);
 
 	sfm.level1 = gtk_vbox_new(FALSE, 2);
 	gtk_container_set_border_width(GTK_CONTAINER(sfm.level1), 4);
