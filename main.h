@@ -19,7 +19,6 @@
 
 #ifndef _SFM_CORE_H_
 #define _SFM_CORE_H_
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,3 +112,5 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/Sobre/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
 static int menu_items_n = sizeof(menu_items) / sizeof(menu_items[0]);
+
+#endif _SFM_CORE_H_
