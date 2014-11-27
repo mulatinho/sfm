@@ -21,7 +21,7 @@
 
 void sfm_handle_leftview(GtkWidget *leftview)
 {
-	GtkWidget *label;
+	GtkWidget *label, *label_two, *label_sc;
 
 	label = gtk_label_new("<b></b>");
 	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
@@ -31,20 +31,20 @@ void sfm_handle_leftview(GtkWidget *leftview)
 	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
 	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
 
-	//g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_link_event), NULL);
+	g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_link_event), NULL);
 
 	// FIXME add personal menus here.
 
-	label = gtk_label_new("<b><a href=\"Samba\">Samba</a> | <a href=\"SSH\">SSH</a> | <a href=\"FTP\">FTP</a></b>");
-	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-	gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
+	label_two = gtk_label_new("<b><a href=\"Samba\">Samba</a> | <a href=\"SSH\">SSH</a> | <a href=\"FTP\">FTP</a></b>");
+	gtk_label_set_use_markup (GTK_LABEL (label_two), TRUE);
+	gtk_box_pack_start(GTK_BOX(leftview), label_two, FALSE, TRUE, 1);
 
-	g_signal_connect(GTK_OBJECT(label), "activate-link", G_CALLBACK(sfm_link_event), NULL);
+	g_signal_connect(GTK_OBJECT(label_two), "activate-link", G_CALLBACK(sfm_link_event), NULL);
 
 	if (!sfm_has_shortcuts()) {
-		label = gtk_label_new("<b>Shortcuts</b>");
-		gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-		gtk_box_pack_start(GTK_BOX(leftview), label, FALSE, TRUE, 1);
+		label_sc = gtk_label_new("<b>Shortcuts</b>");
+		gtk_label_set_use_markup (GTK_LABEL (label_sc), TRUE);
+		gtk_box_pack_start(GTK_BOX(leftview), label_sc, FALSE, TRUE, 1);
 	}
 }
 
