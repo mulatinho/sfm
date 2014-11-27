@@ -1,15 +1,37 @@
-Para instalar este gerenciador de arquivos basta apenas
-digitar dois comandos gerados pelo Makefile;  você pode
-executa-lo como  usuário  normal e instalar apenas para
-você digitando:
+To download all the source code you need to type:
 
-$ tar xfj sfm-versao.tar.bz2
+$ git clone https://github.com/mulatinho/sfm.git
+
+If you want to support and make changes in this software with GDB support
+the best way to build this project is just run 'make' against Makefile
+
+$ cd sfm
 $ make
 
-Para instalar o gerenciador de janelas no sistema  para
-todos os usuários basta digitar 'make install'  no root
+If you wanna build a new release of HEAD version, you will have to do this:
 
-# make install
+$ cd sfm
+$ aclocal
+$ autoconf
+$ automake --add-missing
 
-Obrigado por usar o SFM,
+To install this file manager when you get a official release you just need
+to uncompress the TAR-file and run './configure' then 'make', to install this
+software to all your users please run 'make install'
+
+$ tar xfj sfm-version.tar.bz2
+$ cd sfm-*
+
+# if your system is 32 bits
+$ ./configure --libdir=/usr/lib --prefix=/usr
+# if your system is 64 bits
+$ ./configure --libdir=/usr/lib64 --prefix=/usr
+
+$ make
+
+To install this software for all your users
+
+$ sudo make install
+
+Thanks for use SFM.
 Alexandre Mulatinho.
