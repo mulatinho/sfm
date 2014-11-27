@@ -18,7 +18,7 @@
 //	MA 02110-1301, USA.
 
 #ifndef _SFM_CORE_H_
-#define _SFM_CORE_H_
+#define _SFM_CORE_H_ 1
 
 #include <stdio.h>
 #include <stdlib.h>
