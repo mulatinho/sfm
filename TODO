@@ -21,6 +21,7 @@
     - Integrate with views. 
 
   SFM Preferences
+  - Use SQLITE to store preferences.
   - Manage LDAP/GPG/LUKS/SMB/FTP/SCP profiles using notepads.
 
   Support to integrate with D-BUS and XOrg defaults
@@ -28,10 +29,9 @@
   - ~/.local/share/applications/mimeapps.list
   - Perhaps use D-BUS to connect with another applications.
 
-  Update statusbar with util informations about file;
+  Update statusbar with util informations about file/directory;
 
-  Define if we need fix window size or rearrange her dinamically.
-
+  Delete gtk_fixed widget of this project.
 
   Left View
     - Rearrange the main left menu. 
