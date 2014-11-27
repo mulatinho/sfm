@@ -5,6 +5,7 @@
   - Fix entry PATH issues: event shortcuts, entry edit.
   - Itens selections.
   - Interface themes!? CSS?
+  - REALLY DO SFM ON NCURSES CONSOLE. :-)
 
   Support for GPG, LUKS.
   - libcrypto.c
