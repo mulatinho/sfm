@@ -34,7 +34,9 @@
 #include <dirent.h>
 
 #define PROGNAME "SFM - Simple File Manager"
-#define PROGVERSION "1.0.1"
+#define PROGVERSION "0.0.1"
+
+/* This three definitions will be deprecated, the idea is to user sqlite */
 #define SFM_IMAGES "./picz"
 #define SFM_CONF "./sfm/sfm.conf" 
 #define SFM_CACHE "./sfm/cache" 
@@ -65,8 +67,25 @@ typedef struct {
 	GtkAccelGroup *accel_group;
 } sfm_t;
 
+enum {
+	S_FILENAME,
+	S_FILESIZE,
+	S_FILETYPE,
+	S_FILEMODF,
+	S_FILEPERM,
+	S_ITEMS,
+} sfm_tree_items;
+
+enum {
+	S_FILEPATH,
+	S_FILENAME,
+	S_FILEPICT,
+	S_FILEDIRT,
+	S_ITEMS
+} sfm_icon_items;
+
 sfm_t sfm;
-char sfm_current_path[NAME_MAX];
+char sfm_current_path[FILENAME_MAX];
 
 void sfm_init(void);
 void sfm_about(void);
@@ -93,23 +112,23 @@ void sfm_handle_leftview(GtkWidget *);
 void sfm_warn_message(gchar *, gchar *, gint, gint); 
 
 static GtkItemFactoryEntry menu_items[] = {
-	{ "/_Arquivo", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/Arquivo/_Abrir", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },
-	{ "/Arquivo/sep1", NULL, NULL, 0, "<Separator>", 0 },
-	{ "/Arquivo/_Sair", "<control>S", gtk_main_quit, 0, "<StockItem>", GTK_STOCK_QUIT },
-	{ "/_Editar", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/Editar/_Executar", "<control>E", sfm_run, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Editar/sep1", NULL, NULL, 0, "<Separator>", 0 },
-	{ "/Editar/Copiar", "<control>C", sfm_copy_file, 0, "<StockItem>", GTK_STOCK_COPY },
-	{ "/Editar/Colar", "<control>V", sfm_paste_file, 0, "<StockItem>", GTK_STOCK_CUT },
-	{ "/Editar/sep1", NULL, NULL, 0, "<Separator>", 0 },
-	{ "/Editar/_Preferencias", NULL, sfm_preferences, 0, "<StockItem>", GTK_STOCK_PROPERTIES },
-	{ "/_Visao", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/Visao/_Lista", "<control>E", sfm_view_list, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Visao/_Compactados", "<control>E", sfm_view_compact, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Visao/Icones _Grandes", "<control>E", sfm_view_icons, 0, "<StockItem>", GTK_STOCK_ZOOM_100 },
-	{ "/_Sobre", NULL, NULL, 0, "<LastBranch>", 0 },
-	{ "/Sobre/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
+	{ "/_File", NULL, NULL, 0, "<Branch>", 0 },
+	{ "/File/_Open", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },
+	{ "/File/sep1", NULL, NULL, 0, "<Separator>", 0 },
+	{ "/File/_Exit", "<control>S", gtk_main_quit, 0, "<StockItem>", GTK_STOCK_QUIT },
+	{ "/_Edit", NULL, NULL, 0, "<Branch>", 0 },
+	{ "/Edit/_Execute", "<control>E", sfm_run, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/Edit/sep1", NULL, NULL, 0, "<Separator>", 0 },
+	{ "/Edit/Copy", "<control>C", sfm_copy_file, 0, "<StockItem>", GTK_STOCK_COPY },
+	{ "/Edit/Cut", "<control>V", sfm_paste_file, 0, "<StockItem>", GTK_STOCK_CUT },
+	{ "/Edit/sep1", NULL, NULL, 0, "<Separator>", 0 },
+	{ "/Edit/_Preferences", NULL, sfm_preferences, 0, "<StockItem>", GTK_STOCK_PROPERTIES },
+	{ "/_View", NULL, NULL, 0, "<Branch>", 0 },
+	{ "/View/_List", "<control>E", sfm_view_list, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/View/_Compact", "<control>E", sfm_view_compact, 0, "<StockItem>", GTK_STOCK_EXECUTE },
+	{ "/View/Big _Icons", "<control>E", sfm_view_icons, 0, "<StockItem>", GTK_STOCK_ZOOM_100 },
+	{ "/_About", NULL, NULL, 0, "<LastBranch>", 0 },
+	{ "/About/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
 static int menu_items_n = sizeof(menu_items) / sizeof(menu_items[0]);
 
