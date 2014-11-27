@@ -1,5 +1,6 @@
 # Makefile for file manager
-CFLAGS=`pkg-config --cflags gtk+-2.0 smbclient` -W -funroll-loops -ggdb
+DEBUG=-g -ggdb -Wall
+CFLAGS=`pkg-config --cflags gtk+-2.0 smbclient`
 LIBS=`pkg-config --libs gtk+-2.0 smbclient`
 LINK= $(CFLAGS) $(LIBS) -lpthread
 PATHBINR=/usr/local/bin/sfm
@@ -9,31 +10,31 @@ PATHCONF=/etc/sfm.conf
 all: sfm
 	
 strkey.o: strkey.c
-	clang -o strkey.o -c strkey.c $(CFLAGS) 
+	gcc  -o strkey.o -c strkey.c $(CFLAGS) $(DEBUG)
 
 libsmb.o: libsmb.c
-	clang -o libsmb.o -c libsmb.c $(CFLAGS)
+	gcc  -o libsmb.o -c libsmb.c $(CFLAGS) $(DEBUG)
 
 action.o: action.c
-	clang -o action.o -c action.c $(CFLAGS)
+	gcc  -o action.o -c action.c $(CFLAGS) $(DEBUG)
 	
 util.o: util.c
-	clang -o util.o -c util.c $(CFLAGS)
+	gcc  -o util.o -c util.c $(CFLAGS) $(DEBUG)
 	
 views.o: views.c
-	clang -o views.o -c views.c $(CFLAGS)
+	gcc  -o views.o -c views.c $(CFLAGS) $(DEBUG)
 
 test.o: test.c
-	clang -o test.o -c test.c $(CFLAGS)
+	gcc  -o test.o -c test.c $(CFLAGS) $(DEBUG)
 
 main.o: main.c
-	clang -o main.o -c main.c $(CFLAGS)
+	gcc  -o main.o -c main.c $(CFLAGS) $(DEBUG)
 	
 sfm: strkey.o util.o views.o action.o libsmb.o main.o
-	clang strkey.o util.o views.o action.o libsmb.o main.o -o sfm $(CFLAGS) $(LIBS)
+	gcc strkey.o util.o views.o action.o libsmb.o main.o  -o sfm $(CFLAGS) $(LIBS) $(DEBUG)
 
 test: test.o test.o
-	clang test.o -o test $(CFLAGS) $(LIBS)
+	gcc test.o  -o test $(CFLAGS) $(LIBS)
 
 install:
 	cp -f sfm.cfg $(PATHCONF)
