@@ -1,16 +1,13 @@
 Simple File Manager
-v0.50 - Sat May  4 21:33:42 BRT 2013
 
 This project is a lightweight file manager written only for fun and profit,
 it is written in C with GTK and have some features to interact with remote
-(samba and ssh) file systems :)
+(samba and ssh) file systems. Another cool tool that we want to make in future
+is the SFM file manager in text console with NCURSES library. Wait for it!
 
-INSTALL
-$ git clone https://github.com/mulatinho/sfm
-$ cd sfm; make
-
-RUN
-$ ./sfm
+### Some tips for you
+* ** To install this software please read the INSTALL file.
+* ** To contribute with this software please read the HACKING file.
 
 NEW SHOT
 
