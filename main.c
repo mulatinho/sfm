@@ -41,7 +41,7 @@ void sfm_handle_leftview(GtkWidget *leftview)
 
 	g_signal_connect(GTK_OBJECT(label_two), "activate-link", G_CALLBACK(sfm_link_event), NULL);
 
-	if (!sfm_has_shortcuts()) {
+	if (sfm_has_shortcuts()) {
 		label_sc = gtk_label_new("<b>Shortcuts</b>");
 		gtk_label_set_use_markup (GTK_LABEL (label_sc), TRUE);
 		gtk_box_pack_start(GTK_BOX(leftview), label_sc, FALSE, TRUE, 1);
@@ -98,6 +98,14 @@ int main(int argc, char **argv)
 	
 	sfm_handle_leftview(sfm.level3);
 	
+	sfm.shlabel = gtk_label_new("<b></b>");
+	gtk_label_set_use_markup (GTK_LABEL (sfm.shlabel), TRUE);
+	gtk_box_pack_start(GTK_BOX(sfm.level3), sfm.shlabel, FALSE, FALSE, 1);
+
+	sfm.shlabel = gtk_label_new("<b>Network List</b>");
+	gtk_label_set_use_markup (GTK_LABEL (sfm.shlabel), TRUE);
+	gtk_box_pack_start(GTK_BOX(sfm.level3), sfm.shlabel, FALSE, FALSE, 1);
+
 	sfm.clist = gtk_clist_new(1);
 	gtk_clist_set_shadow_type(GTK_CLIST(sfm.clist), GTK_SHADOW_OUT);
 

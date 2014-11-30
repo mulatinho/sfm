@@ -58,7 +58,7 @@ typedef struct {
 
 	GtkWidget *path_fixed, *path_entry, *path_label;
 
-	GtkWidget *clist, *clist_two;
+	GtkWidget *shlabel, *clist, *clist_two;
 	
 	GtkWidget *scroll, *viewport, *fixedright;
 
@@ -68,28 +68,33 @@ typedef struct {
 } sfm_t;
 
 enum {
-	S_FILENAME,
+	S_FILENMTR,
 	S_FILESIZE,
 	S_FILETYPE,
 	S_FILEMODF,
 	S_FILEPERM,
-	S_ITEMS,
+	S_TRITEMS,
 } sfm_tree_items;
 
 enum {
-	S_FILEPATH,
+	S_FILENMIC,
 	S_FILENAME,
 	S_FILEPICT,
 	S_FILEDIRT,
-	S_ITEMS
+	S_ICITEMS
 } sfm_icon_items;
 
+/* Global Variables */
 sfm_t sfm;
 char sfm_current_path[FILENAME_MAX];
 
+/* Some important functions */
 void sfm_init(void);
 void sfm_about(void);
-void sfm_execute(GtkWidget *, GdkEvent *, gpointer);
+
+void sfm_handle_leftview(GtkWidget *leftview);
+
+void sfm_execute(GtkWidget *, GdkEventButton *, gpointer);
 void sfm_path_new(GtkWidget *, GdkEvent *, gpointer);
 void sfm_select_item(GtkWidget *, gint, gint); 
 void sfm_select_menu(GtkWidget *, gint, gint); 
@@ -104,7 +109,7 @@ void sfm_view_list(GtkWidget *, gpointer);
 void sfm_view_icons(GtkWidget *, gpointer);
 void sfm_view_compact(GtkWidget *, gpointer);
 
-void sfm_link_event(GtkWidget *, const gchar *, gpointer);
+void sfm_link_event(GtkWidget *label, const gchar *uri, gpointer data);
 void sfm_link_home(GtkWidget *, const gchar *, gpointer);
 void sfm_link_network(GtkWidget *, const gchar *, gpointer);
 

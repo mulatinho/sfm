@@ -134,17 +134,9 @@ void sfm_scan_directory(int hidden)
 	int loop, xstat, x, y, filen, t, r;
 	int hsize, wsize;
 	char iconname[256], filename[256];
-	GdkScreen *screen;
 
 	memset(filename, '\0', NAME_MAX);
 	memset(iconname, '\0', NAME_MAX);
-
-	screen = gtk_widget_get_screen(sfm.fixedright);
-
-	hsize = gdk_screen_get_height(screen);
-	wsize = gdk_screen_get_width(screen);
-
-	fprintf(stdout, "hsize: %d, wsize: %d\n", hsize, wsize);
 
 	if (sfm.viewport)
 		gtk_widget_destroy(sfm.viewport);
@@ -157,9 +149,9 @@ void sfm_scan_directory(int hidden)
 
 	if (sfm.fileview)
 		gtk_widget_destroy(sfm.fileview);
-
+		
 	sfm.fileview = gtk_hbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
+	gtk_widget_reparent(sfm.fileview, sfm.leftview);
 
 	sfm.scroll = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_shadow_type((GtkScrolledWindow*)sfm.scroll, GTK_SHADOW_NONE);
