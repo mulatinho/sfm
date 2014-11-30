@@ -151,9 +151,11 @@ void sfm_open(GtkWidget *wid, gpointer p)
 	gtk_widget_destroy (dialog); 
 }
 
-void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
+void sfm_execute(GtkWidget *wid, GdkEventButton *event, gpointer p)
 {
-	GdkColor color = {0, 0xffff, 0xffff, 0xffaa};
+	GtkWidget *sfm_rb_popup;
+	GtkWidget *sfm_rb_popup_copy, *sfm_rb_popup_paste;
+	GdkColor color = {0, 0xffaa, 0xffff, 0xffaa};
 	gchar filen[NAME_MAX], testf[NAME_MAX];
 	struct stat obj;
 	int i;
@@ -165,6 +167,23 @@ void sfm_execute(GtkWidget *wid, GdkEvent *event, gpointer p)
 
 	switch (event->type) {
 	case GDK_BUTTON_PRESS:
+		if (event->button == 3) {
+			fprintf(stdout, "click direito!?\n");
+
+			sfm_rb_popup = gtk_menu_new();
+			sfm_rb_popup_copy = gtk_menu_item_new_with_label("Copy");
+			sfm_rb_popup_paste = gtk_menu_item_new_with_label("Paste");
+			
+			gtk_menu_append(GTK_MENU(sfm_rb_popup), sfm_rb_popup_copy);
+			gtk_menu_append(GTK_MENU(sfm_rb_popup), sfm_rb_popup_paste);
+			
+			gtk_widget_show(sfm_rb_popup_copy);
+			gtk_widget_show(sfm_rb_popup_paste);
+			
+			gtk_menu_popup(GTK_MENU(sfm_rb_popup), NULL, NULL, NULL, NULL,
+					0, event->time);
+		}
+
 		gtk_widget_modify_bg(wid, GTK_STATE_SELECTED, &color);
 		break;
 
