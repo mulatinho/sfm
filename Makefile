@@ -9,9 +9,6 @@ PATHCONF=/etc/sfm.conf
 
 all: sfm
 	
-strkey.o: strkey.c
-	gcc  -o strkey.o -c strkey.c $(CFLAGS) $(DEBUG)
-
 libsmb.o: libsmb.c
 	gcc  -o libsmb.o -c libsmb.c $(CFLAGS) $(DEBUG)
 
@@ -30,8 +27,8 @@ test.o: test.c
 main.o: main.c
 	gcc  -o main.o -c main.c $(CFLAGS) $(DEBUG)
 	
-sfm: strkey.o util.o views.o action.o libsmb.o main.o
-	gcc strkey.o util.o views.o action.o libsmb.o main.o  -o sfm $(CFLAGS) $(LIBS) $(DEBUG)
+sfm: util.o views.o action.o libsmb.o main.o
+	gcc util.o views.o action.o libsmb.o main.o  -o sfm $(CFLAGS) $(LIBS) $(DEBUG)
 
 test: test.o test.o
 	gcc test.o  -o test $(CFLAGS) $(LIBS)
