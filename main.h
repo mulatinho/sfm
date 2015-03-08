@@ -33,8 +33,10 @@
 #include <gtk/gtk.h>
 #include <dirent.h>
 
-#define PROGNAME "SFM - Simple File Manager"
-#define PROGVERSION "0.0.1"
+#define PROGNAME "SFM - (A Lightweight) Simple File Manager"
+#define PROGVERSION "0.01"
+#define PROGAUTHOR "Alexandre Mulatinho <alex at mulatinho dot net>"
+#define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
 
 /* This three definitions will be deprecated, the idea is to user sqlite */
 #define SFM_IMAGES "./picz"
@@ -44,6 +46,8 @@
 #define ICON_SZ_S 16
 #define ICON_SZ_M 32
 #define ICON_SZ_L 64 
+
+#define NFILEMAXSZ 512
 
 #define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 
