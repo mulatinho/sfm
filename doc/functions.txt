@@ -1,0 +1,19 @@
+function		desc
+-----------------------+------------------------------------------------------
+main			principal function of sfm, obviously.
+sfm_handle_main
+sfm_handle_menubar	handle all actions in menubar
+sfm_handle_localdir	handle local diror, $PWD
+sfm_handle_leftview	handle left side of sfm
+sfm_handle_statusbar	handle status bar
+sfm_handle_rightview	handle right side of sfm
+
+sfm_handle_shortcuts
+sfm_handle_netview
+
+sfm_handle_preferences
+
+actions
+
+sfm_exec_file		execute file using default app
+sfm_scan_directory	read dir and set struct as
