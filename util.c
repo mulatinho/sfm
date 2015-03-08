@@ -18,7 +18,6 @@
 //	MA 02110-1301, USA.
 
 #include "main.h"
-#define NFILEMAXSZ 512
 
 struct mfile {
 	int id;
@@ -73,9 +72,9 @@ void sfm_exec_file(gchar *current_file)
 	gint status = 0, totalbytez = 0;
 	pid_t tid;
 
-	memset(inbuf, '\0', sizeof(inbuf));
-	memset(outbuf, '\0', sizeof(outbuf));
-	memset(rbuf, '\0', sizeof(rbuf));
+	BUFFER_ZERO(rbuf);
+	BUFFER_ZERO(inbuf);
+	BUFFER_ZERO(outbuf);
 
 	g_snprintf(inbuf, sizeof(inbuf)-1, "xdg-open \"%s\"", current_file);
 
@@ -85,7 +84,7 @@ void sfm_exec_file(gchar *current_file)
 			while (fgets(rbuf, sizeof(rbuf-1), fp)) {
 				totalbytez+=strlen(rbuf);
 				strncat(outbuf, rbuf, strlen(rbuf)-1);
-				memset(rbuf, '\0', sizeof(rbuf));
+				BUFFER_ZERO(rbuf);
 			}
 			fclose(fp);
 		}
@@ -141,8 +140,9 @@ void sfm_scan_directory(int hidden)
 	int hsize, wsize;
 	char iconname[256], filename[256];
 
-	memset(filename, '\0', NAME_MAX);
-	memset(iconname, '\0', NAME_MAX);
+
+	BUFFER_ZERO(filename);
+	BUFFER_ZERO(iconname);
 
 	if (sfm.viewport)
 		gtk_widget_destroy(sfm.viewport);
@@ -182,7 +182,7 @@ void sfm_scan_directory(int hidden)
 	for (loop = 0, y = 10; loop < xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, 
 		strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filename, NAME_MAX, "%s/%s", sfm_current_path, utf8);
+		snprintf(filename, NFILEMAXSZ, "%s/%s", sfm_current_path, utf8);
 
 		lstat(filename, &obj);
 		
@@ -212,7 +212,7 @@ void sfm_scan_directory(int hidden)
 				filen--;
 		}
 
-		memset(filename, '\0', NAME_MAX);
+		BUFFER_ZERO(filename);
 		filen++;
 	}
 
