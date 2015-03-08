@@ -43,7 +43,9 @@
 
 #define ICON_SZ_S 16
 #define ICON_SZ_M 32
-#define ICON_SZ_L 130
+#define ICON_SZ_L 64 
+
+#define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 
 typedef struct {
 	GtkWidget *firstwin;
