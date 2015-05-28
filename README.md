@@ -6,8 +6,10 @@ it is written in C with GTK and have some features to interact with remote
 is the SFM file manager in text console with NCURSES library. Wait for it!
 
 ### Some tips for you
-* ** To install this software please read the INSTALL file.
-* ** To contribute with this software please read the HACKING file.
+* You should not use the last development release now, this is just for developers
+who are interested in contribure, instead download some (real release in this url)[https://github.com/mulatinho/sfm/releases]
+* To install this software please read the INSTALL file.
+* To contribute with this software please read the HACKING file.
 
 NEW SHOT
 
