@@ -23,5 +23,5 @@ PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES(GTK, gtk+-2.0 >= 2.10.0, HAVE_GTK="yes")
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.2.0, HAVE_GLIB="yes")
 
-AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile po/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
