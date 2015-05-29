@@ -1,8 +1,7 @@
-bin_PROGRAMS = sfm
+# Simple makefile for SFM GUI and Ncurses
+EXTRA_DIST=HACKING README.md INSTALL COPYING
+SUBDIRS=doc po src tests 
 
-sfm_SOURCES = action.c build_env.sh libsmb.c main.c main.h strkey.c util.c views.c
-
-sfm_CFLAGS = `pkg-config --cflags gtk+-2.0 smbclient`
-
-sfm_LDFLAGS = -lpthread
-sfm_LDFLAGS+= `pkg-config --libs gtk+-2.0 smbclient`
+clean:
+	rm -rfv autom4te.cache
+	rm -fv *.in */*.in aclocal.m4 compile config.* configure depcomp missing install-sh *~
