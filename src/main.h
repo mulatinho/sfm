@@ -32,6 +32,7 @@
 #include <linux/limits.h>
 #include <gtk/gtk.h>
 #include <dirent.h>
+#include <ncurses.h>
 
 #define PROGNAME "SFM - (A Lightweight) Simple File Manager"
 #define PROGVERSION "0.01"

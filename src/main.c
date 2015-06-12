@@ -28,7 +28,11 @@ int main(int argc, char **argv)
 
 	while ((opt = getopt(argc, argv, "nv")) != -1) {
 		switch (opt) {
+		case 'g':
+			sfm_gui();
+			break;
 		case 'n':
+			sfm_ncurses();
 			break;
 		case 'v':
 			fprintf(stdout, SFM_VERSION);
@@ -40,7 +44,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	sfm_gui();
+	sfm_ncurses();
 
 	return 0;
 }

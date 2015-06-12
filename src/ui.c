@@ -167,6 +167,49 @@ void sfm_gui(void)
 
 	gtk_widget_show_all(sfm.firstwin);
 	gtk_main();
+}
+
+void sfm_list_directory(void);
+
+void sfm_ncurses(void)
+{
+	WINDOW *sfm_root_window;
+	int row, col, user_input;
+
+	initscr();
 	
-	return 0;
+	cbreak();
+
+	getmaxyx(stdscr, row, col);
+
+	keypad(stdscr, TRUE);
+
+	sfm_root_window = newwin(row-6, col-1, 5, 1);
+
+	box(sfm_root_window, 0, 0);
+
+	while (1) {
+		user_input = wgetch(sfm_root_window);
+
+		switch (user_input) {
+			case KEY_LEFT:
+				break;
+			case KEY_RIGHT:
+				break;
+			case KEY_UP:
+				break;
+			case KEY_DOWN:
+				delwin(sfm_root_window);
+				goto sfm_ncurses_exit;
+		}
+	
+		mvprintw(1, col, ":. status: %d", user_input);
+		
+		wrefresh(sfm_root_window);
+
+		refresh();
+	} 
+
+	sfm_ncurses_exit:
+	endwin();
 }
