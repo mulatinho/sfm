@@ -21,12 +21,10 @@
 
 int main(int argc, char **argv)
 {
-	gchar buf[NFILEMAXSZ];
-	gchar **text = NULL;
 	gint opt = 0;
-	gint ncurses = 0;
+	gint user = 0;
 
-	while ((opt = getopt(argc, argv, "nv")) != -1) {
+	while ((opt = getopt(argc, argv, "gnv")) != -1) {
 		switch (opt) {
 		case 'g':
 			sfm_gui();
@@ -38,13 +36,12 @@ int main(int argc, char **argv)
 			fprintf(stdout, SFM_VERSION);
 			exit(0);
 			break;
-		default:
-			fprintf(stdout, "usage: %s [-n ncurses] [-v version]\n", argv[0]);
-			return -1;
 		}
+		user++;
 	}
-
-	sfm_ncurses();
+	
+	if (!user)
+		fprintf(stdout, "usage: %s [-n ncurses|-g graphical|-v version]\n", argv[0]);
 
 	return 0;
 }
