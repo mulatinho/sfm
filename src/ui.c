@@ -19,6 +19,12 @@
 
 #include "main.h"
 
+struct sfm_ncurses {
+	WINDOW *sfmncmenu;
+	WINDOW *sfmnroot;
+	WINDOW *sfmnstatus;
+	int lines, cols;
+};
 
 void sfm_handle_menubar(GtkWidget *menubar)
 {
@@ -126,7 +132,7 @@ void sfm_gui(void)
 	sfm.clist = gtk_clist_new(1);
 	gtk_clist_set_shadow_type(GTK_CLIST(sfm.clist), GTK_SHADOW_OUT);
 
-	text = malloc(NFILEMAXSZ * 5); // NFILEMAXSZ chars, 5 lines
+	text = malloc(NFILEMAXSZ * 5); // NFILEMAXSZ chars, 5 iface->lines
 	
 	snprintf(buf, NFILEMAXSZ-1, "raiz: /");
 	text[0] = (char*)buf;
@@ -161,7 +167,7 @@ void sfm_gui(void)
 	sfm_scan_directory(1);
 	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 
-	g_signal_connect(GTK_OBJECT(sfm.clist), "select_row", GTK_SIGNAL_FUNC(sfm_select_menu), NULL);
+	g_signal_connect(GTK_OBJECT(sfm.clist), "select_iface->lines", GTK_SIGNAL_FUNC(sfm_select_menu), NULL);
 	g_signal_connect(GTK_OBJECT(sfm.path_entry), "key-press-event", GTK_SIGNAL_FUNC(sfm_path_new), NULL);
 	g_signal_connect(G_OBJECT(sfm.firstwin), "delete_event", gtk_main_quit, NULL);
 
@@ -173,43 +179,63 @@ void sfm_list_directory(void);
 
 void sfm_ncurses(void)
 {
-	WINDOW *sfm_root_window;
-	int row, col, user_input;
+	struct sfm_ncurses *iface = malloc(sizeof(struct sfm_ncurses));
+	int user_input;
 
 	initscr();
 	
-	cbreak();
+	noecho();
 
-	getmaxyx(stdscr, row, col);
+	cbreak();
+	
+	getmaxyx(stdscr, iface->lines, iface->cols);
 
 	keypad(stdscr, TRUE);
 
-	sfm_root_window = newwin(row-6, col-1, 5, 1);
+	refresh();
 
-	box(sfm_root_window, 0, 0);
+	iface->sfmncmenu = newwin(3, iface->cols-1, 0, 1);
+	box(iface->sfmncmenu, 0, 0);
+	wrefresh(iface->sfmncmenu);
+
+	iface->sfmnroot = newwin(iface->lines-5, iface->cols-1, 3, 1);
+	box(iface->sfmnroot, 0, 0);
+	wrefresh(iface->sfmnroot);
+
+	iface->sfmnstatus = newwin(1, iface->cols-1, iface->lines-2, 1);
+	mvprintw(iface->sfmnstatus, 1, 1, 
+			":. Hello! Welcome to  .: %s :. iface->lines:%d, iface->cols:%d", 
+			SFM_VERSION, iface->lines, iface->cols);
+	wrefresh(iface->sfmnstatus); 
 
 	while (1) {
-		user_input = wgetch(sfm_root_window);
+		user_input = getch();
 
 		switch (user_input) {
-			case KEY_LEFT:
-				break;
-			case KEY_RIGHT:
-				break;
-			case KEY_UP:
-				break;
-			case KEY_DOWN:
-				delwin(sfm_root_window);
-				goto sfm_ncurses_exit;
-		}
-	
-		mvprintw(1, col, ":. status: %d", user_input);
-		
-		wrefresh(sfm_root_window);
+		case KEY_LEFT:
+			break;
+		case KEY_RIGHT:
+			break;
+		case KEY_UP:
+			break;
+		case KEY_DOWN:
+			break;
+		case 'Q':
+		case 'q':
+			wprintw(iface->sfmnstatus, ":. Are you sure you want to quit!? ");
+			wrefresh(iface->sfmnstatus);
+			sleep(1);
 
-		refresh();
+			delwin(iface->sfmnroot);
+			goto sfm_ncurses_exit;
+		}
+
+		wclear(iface->sfmnstatus);
+		wprintw(iface->sfmnstatus, ":. status: %d", user_input);
+		wrefresh(iface->sfmnstatus);
 	} 
 
 	sfm_ncurses_exit:
+	free(iface);
 	endwin();
 }
