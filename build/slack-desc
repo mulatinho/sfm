@@ -8,11 +8,11 @@
        |-----handy-ruler------------------------------------------------------|
 appname: sfm (simple file manager)
 appname:
-appname: Long description of appname, wrapped at 71 characters *after* the
-appname: colon following "appname" (and the 'handy ruler' should start at
-appname: that colon and be exactly 71 characters long).
-appname: If there is room, there might be a link to the homepage of the
-appname: application on one of these lines, but it's not necessary.
+appname: This is another file manager, one version of this software runs on
+appname: pure console using NCURSES library, another version is a graphical
+appname: user interface based on GTK library.
+appname: 
+appname: Thanks for use this software. :-)
 appname:
 appname: Written and packaged by Alexandre Mulatinho.
 appname: This is a free software made for fun and profit, thank you for use.
