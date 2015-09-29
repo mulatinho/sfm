@@ -1,0 +1,4 @@
+language: c
+install: ./autogen.sh
+compiler: gcc
+script: ./configure && make
