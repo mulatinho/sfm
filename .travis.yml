@@ -8,4 +8,6 @@ before_install:
 install:
 - ./autogen.sh
 - ls /usr/*/pkgconfig 
+- ls /usr/lib/i386-linux-gnu/pkgconfig/smbclient.pc 
+- sudo ln -sf /usr/lib/i386-linux-gnu/pkgconfig/smbclient.pc /usr/lib/pkgconfig/
 - pkg-config --cflags gtk+-2.0 smbclient
