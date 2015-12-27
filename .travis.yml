@@ -7,3 +7,5 @@ before_install:
 
 install:
 - ./autogen.sh
+- pkg-config --cflags gtk+-2.0 smbclient
+- ls /usr/*/pkgconfig 
