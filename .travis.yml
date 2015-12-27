@@ -3,11 +3,9 @@ compiler: gcc
 
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -y build-essential libxml2-dev libgtk2.0-dev libsmbclient-dev
+- sudo apt-get install -y build-essential libxml2-dev libgtk2.0-dev libsmbclient-dev ncurses-devel
 
 install:
 - ./autogen.sh
-- ls /usr/*/pkgconfig 
-- ls /usr/lib/i386-linux-gnu/pkgconfig/smbclient.pc 
-- sudo ln -sf /usr/lib/i386-linux-gnu/pkgconfig/smbclient.pc /usr/lib/pkgconfig/
-- pkg-config --cflags gtk+-2.0 smbclient
+- dpkg -l libsmbclient-dev
+- dpkg -L libsmbclient-dev
