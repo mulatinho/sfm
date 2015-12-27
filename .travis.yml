@@ -3,7 +3,7 @@ compiler: gcc
 
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -y build-essential libxml2-dev libgtk2.0-dev libsmbclient-dev ncurses-devel
+- sudo apt-get install -y build-essential libxml2-dev libgtk2.0-dev libsmbclient-dev ncurses-dev
 
 install:
 - ./autogen.sh
