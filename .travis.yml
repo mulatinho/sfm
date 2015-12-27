@@ -7,5 +7,3 @@ before_install:
 
 install:
 - ./autogen.sh
-- dpkg -l libsmbclient-dev
-- dpkg -L libsmbclient-dev
