@@ -2,8 +2,11 @@
 *.o*
 .*
 sfm
-config{ure,.log,.status}
-Makefile{,.in}
+configure
+config.log
+config.status
+Makefile
+Makefile.in
 *m4*
 depcomp
 install-sh
