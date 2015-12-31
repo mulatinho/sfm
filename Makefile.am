@@ -12,3 +12,4 @@ clean:
 	rm -rfv autom4te.cache src/sfm */.deps/
 	rm -fv *.in */*.in */*.o */*~ aclocal.m4 compile config.* configure depcomp missing install-sh test-driver *~ .*~
 	rm -fv {.,src}/Makefile
+	find . -type l -exec rm -fv '{}' \;
