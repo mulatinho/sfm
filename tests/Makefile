@@ -1,12 +1,16 @@
 # Simple makefile for SFM GUI and Ncurses
-CFLAGS = `pkg-config --cflags gtk+-2.0 smbclient`
+CC      = gcc
+CFLAGS  = `pkg-config --cflags gtk+-2.0 smbclient`
 LDFLAGS = -lpthread
 LDFLAGS+= `pkg-config --libs gtk+-2.0 smbclient`
 
-all: test01.c test02.c
-	
+all: test01 test02
+
+*.o:
+	gcc $(CFLAGS) $< -o $@
+
 *.c:
 	gcc -Wall $^ -o $@
 
 clean:
-	rm -fv *~
+	rm -fv test[0-9][0-9] *~
