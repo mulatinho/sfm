@@ -2,3 +2,9 @@
 *.o*
 .*
 sfm
+config{ure,.log,.status}
+Makefile{,.in}
+*m4*
+depcomp
+install-sh
+missing
