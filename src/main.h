@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -47,8 +48,6 @@
 #define ICON_SZ_S 16
 #define ICON_SZ_M 32
 #define ICON_SZ_L 64 
-
-#define NFILEMAXSZ 512
 
 #define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 
@@ -96,7 +95,7 @@ sfm_t sfm;
 char sfm_current_path[FILENAME_MAX];
 
 /* Some important functions */
-void sfm_init(void);
+/*void sfm_init(void);
 void sfm_about(void);
 
 void sfm_handle_leftview(GtkWidget *leftview);
@@ -143,5 +142,6 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/About/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
 static int menu_items_n = sizeof(menu_items) / sizeof(menu_items[0]);
+*/
 
-#endif _SFM_CORE_H_
+#endif
