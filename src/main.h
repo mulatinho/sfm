@@ -35,6 +35,11 @@
 #include <dirent.h>
 #include <ncurses.h>
 
+#include "operations.h"
+#include "util.h"
+#include "views.h"
+#include "gui.h"
+
 #define PROGNAME "SFM - (A Lightweight) Simple File Manager"
 #define PROGVERSION "0.01"
 #define PROGAUTHOR "Alexandre Mulatinho <alex at mulatinho dot net>"
