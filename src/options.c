@@ -49,7 +49,7 @@ int sfm_config_load(void)
 	char line[
 	
 	if ((fd = open(realfile, O_RDONLY)) != -1) {
-
+		close(fd);
 	}
 
 	return 0;

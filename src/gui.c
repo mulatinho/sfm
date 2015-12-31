@@ -72,13 +72,13 @@ void sfm_handle_rightview(GtkWidget *rightview)
 
 void sfm_gui(void)
 {
-	gchar buf[NFILEMAXSZ];
+	gchar buf[FILENAME_MAX];
 	gchar **text = NULL;
 
 	gtk_init(NULL, NULL);
 
 	BUFFER_ZERO(sfm_current_path);
-	snprintf(sfm_current_path, NFILEMAXSZ-1, "%s", getenv("HOME"));
+	snprintf(sfm_current_path, FILENAME_MAX-1, "%s", getenv("HOME"));
 
 	/* principal window */
 	sfm.firstwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -132,21 +132,21 @@ void sfm_gui(void)
 	sfm.clist = gtk_clist_new(1);
 	gtk_clist_set_shadow_type(GTK_CLIST(sfm.clist), GTK_SHADOW_OUT);
 
-	text = malloc(NFILEMAXSZ * 5); // NFILEMAXSZ chars, 5 iface->lines
+	text = malloc(FILENAME_MAX * 5); // FILENAME_MAX chars, 5 iface->lines
 	
-	snprintf(buf, NFILEMAXSZ-1, "raiz: /");
+	snprintf(buf, FILENAME_MAX-1, "raiz: /");
 	text[0] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[0]);
 	
 	text[1] = getenv("HOME");
-	snprintf(buf, NFILEMAXSZ-1, "home: %s", text[1]);
+	snprintf(buf, FILENAME_MAX-1, "home: %s", text[1]);
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[1]);
 	
-	snprintf(buf, NFILEMAXSZ-1, "smb://host/dir");
+	snprintf(buf, FILENAME_MAX-1, "smb://host/dir");
 	text[2] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[2]);
 	
-	snprintf(buf, NFILEMAXSZ-1, "ssh://user@host");
+	snprintf(buf, FILENAME_MAX-1, "ssh://user@host");
 	text[3] = (char*)buf;
 	gtk_clist_append(GTK_CLIST(sfm.clist), (char**)&text[3]);
 	
@@ -155,7 +155,7 @@ void sfm_gui(void)
 	
 	free(text);
 
-	snprintf(buf, NFILEMAXSZ-1, "%s/sfm.png", SFM_IMAGES);
+	snprintf(buf, FILENAME_MAX-1, "%s/sfm.png", SFM_IMAGES);
 	sfm.logo = gtk_image_new_from_file(buf);
 	gtk_box_pack_start(GTK_BOX(sfm.level3), sfm.logo, FALSE, TRUE, 1);
 

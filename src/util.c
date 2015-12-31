@@ -21,7 +21,7 @@
 
 struct mfile {
 	int id;
-	char fname[NFILEMAXSZ];
+	char fname[FILENAME_MAX];
 	struct stat st;
 	struct mfile *next;
 };
@@ -97,22 +97,22 @@ void sfm_exec_file(gchar *current_file)
 GtkWidget *sfm_create_icon(GtkWidget *box, gchar *label, gchar *file, int x, int y)
 {
 	GtkWidget *vbox, *image, *label1, *eventbox;
-	gchar buf[NFILEMAXSZ], filen[NFILEMAXSZ];
+	gchar buf[FILENAME_MAX], filen[FILENAME_MAX];
 	struct stat obj;
 
 	eventbox = gtk_event_box_new();
 
-	snprintf(filen, NFILEMAXSZ-1, "%s/%s", sfm_current_path, file);
+	snprintf(filen, FILENAME_MAX-1, "%s/%s", sfm_current_path, file);
 	lstat(filen, &obj);
 
 	if (S_ISDIR(obj.st_mode)) 
 		image = gtk_image_new_from_stock(GTK_STOCK_DIRECTORY, 
 			GTK_ICON_SIZE_DIALOG);
-		/* snprintf(buf, NFILEMAXSZ-1, "%s/sfmfolder.png", SFM_IMAGES); */
+		/* snprintf(buf, FILENAME_MAX-1, "%s/sfmfolder.png", SFM_IMAGES); */
 	else 
 		image = gtk_image_new_from_stock(GTK_STOCK_FILE,
 			GTK_ICON_SIZE_DIALOG);
-		/* snprintf(buf, NFILEMAXSZ-1, "%s/sfmfile.png", SFM_IMAGES); */
+		/* snprintf(buf, FILENAME_MAX-1, "%s/sfmfile.png", SFM_IMAGES); */
 	
 	label1 = gtk_label_new(label);
 	gtk_widget_set_usize(GTK_WIDGET(label1), 125, 80);
@@ -182,7 +182,7 @@ void sfm_scan_directory(int hidden)
 	for (loop = 0, y = 10; loop < xstat; loop++) {
 		utf8 = g_locale_to_utf8(files[loop]->d_name, 
 		strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filename, NFILEMAXSZ, "%s/%s", sfm_current_path, utf8);
+		snprintf(filename, FILENAME_MAX, "%s/%s", sfm_current_path, utf8);
 
 		lstat(filename, &obj);
 		

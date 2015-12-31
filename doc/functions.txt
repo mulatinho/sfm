@@ -1,7 +1,17 @@
+ascii
+-----------------------
+ _____
+| mem |
+ -----
+
+
+
 function		desc
 -----------------------+------------------------------------------------------
 main			principal function of sfm, obviously.
-sfm_handle_main
+
+sfm_handle_main         validate preferences and what ui the user wants
+
 sfm_handle_menubar	handle all actions in menubar
 sfm_handle_localdir	handle local diror, $PWD
 sfm_handle_leftview	handle left side of sfm
