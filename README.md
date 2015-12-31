@@ -1,4 +1,4 @@
-Simple File Manager [![Build Status](https://secure.travis-ci.org/mulatinho/sfm?branch=master)](http://travis-ci.org/mulatinho/sfm)
+Simple File Manager [![Build Status](https://travis-ci.org/mulatinho/sfm.svg?branch=master)](http://travis-ci.org/mulatinho/sfm)
 ===================
 
 This project is a lightweight file manager written only for fun and profit,
@@ -19,8 +19,10 @@ release in this url:
 SCREENSHOTS
 
 ![SFM02](https://mulatinho.files.wordpress.com/2015/12/sfm02.png)
+
 ![SFM01](https://mulatinho.files.wordpress.com/2015/12/sfm01.png)
-![SFM03](https://mulatinho.files.wordpress.com/2015/12/sfm03.png)
+
+![SFM00](https://mulatinho.files.wordpress.com/2015/12/sfm00.png)
 
 Written by
 Alexandre Mulatinho. <alex@mulatinho.net> 
