@@ -1,5 +1,7 @@
 #include "main.h"
 
+#define SFM_CONFIG ".config/sfm/config"
+
 int sfm_config_init(void)
 {
 	int i, fd;
@@ -43,12 +45,22 @@ int sfm_config_init(void)
 	return 0;
 }
 
+int sfm_config_set(char *key, char *value)
+{
+	return 0;
+}
+
 int sfm_config_load(void)
 {
-	int fd;
-	char line[
-	
+	int fd, bytes;
+	char *env_home = getenv("HOME");
+	char realfile[FILENAME_MAX];
+	char line[FILENAME_MAX];
+
 	if ((fd = open(realfile, O_RDONLY)) != -1) {
+		while ((bytes = read(fd, line, sizeof(line)-1)) != -1) {
+			fprintf(stdout, "%s", line);
+		}
 		close(fd);
 	}
 
@@ -60,10 +72,13 @@ int main(void)
 	int ret = 0;
 
 	ret = sfm_config_init();
-	fprintf(stdout, "ret: %d\n", ret);
+	fprintf(stdout, "sfm_config_init: %d\n", ret);
 
 	ret = sfm_config_load();
-	fprintf(stdout, "ret: %d\n", ret);
+	fprintf(stdout, "sfm_config_load: %d\n", ret);
+
+	ret = sfm_config_set("ui", "ncurses");
+	fprintf(stdout, "sfm_config_set : %d\n", ret);
 
 	return 0;
 }
