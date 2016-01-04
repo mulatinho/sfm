@@ -1,11 +1,22 @@
 #include "main.h"
+/*#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
+#define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
+*/
 #define SFM_CONFIG ".config/sfm/config"
+#define DEBUG(buffer) fprintf(stdout, "%s\n", buffer)
 
 int sfm_config_init(void)
 {
 	int i, fd;
-	char *env_home = getenv("HOME");
+	char *ENV_HOME = getenv("HOME");
 	char realfile[FILENAME_MAX];
 
 	for (i=0; i<2; i++) {
@@ -13,10 +24,10 @@ int sfm_config_init(void)
 
 		if (!i) 
 			snprintf(realfile, FILENAME_MAX-1, 
-				"%s/%s", env_home, ".config");
+				"%s/%s", ENV_HOME, ".config");
 		else 
 			snprintf(realfile, FILENAME_MAX-1, 
-				"%s/%s", env_home, ".config/sfm");
+				"%s/%s", ENV_HOME, ".config/sfm");
 
 		if (mkdir(realfile, S_IRWXU) == -1) {
 			if (errno != EEXIST) {
@@ -28,7 +39,7 @@ int sfm_config_init(void)
 	}
 
 	BUFFER_ZERO(realfile);
-	snprintf(realfile, FILENAME_MAX-1, "%s/%s", env_home, ".config/sfm/config");
+	snprintf(realfile, FILENAME_MAX-1, "%s/%s", ENV_HOME, SFM_CONFIG);
 
 	if ((fd = open(realfile, O_RDONLY)) == -1) {
 		if ((fd = open(realfile, O_CREAT, S_IWUSR|S_IRUSR)) == -1) {
@@ -52,33 +63,24 @@ int sfm_config_set(char *key, char *value)
 
 int sfm_config_load(void)
 {
-	int fd, bytes;
-	char *env_home = getenv("HOME");
+	FILE *fp;
+	int bytes;
+	char *ENV_HOME = getenv("HOME");
 	char realfile[FILENAME_MAX];
 	char line[FILENAME_MAX];
 
-	if ((fd = open(realfile, O_RDONLY)) != -1) {
-		while ((bytes = read(fd, line, sizeof(line)-1)) != -1) {
+	BUFFER_ZERO(realfile);
+	snprintf(realfile, FILENAME_MAX-1, "%s/%s", ENV_HOME, SFM_CONFIG);
+
+	if ((fp = fopen(realfile, "r")) != NULL) {
+		while (fgets(line, sizeof(line)-1, fp)) {
 			fprintf(stdout, "%s", line);
+
+			
 		}
-		close(fd);
+		fclose(fp);
 	}
-
+	
 	return 0;
 }
 
-int main(void)
-{
-	int ret = 0;
-
-	ret = sfm_config_init();
-	fprintf(stdout, "sfm_config_init: %d\n", ret);
-
-	ret = sfm_config_load();
-	fprintf(stdout, "sfm_config_load: %d\n", ret);
-
-	ret = sfm_config_set("ui", "ncurses");
-	fprintf(stdout, "sfm_config_set : %d\n", ret);
-
-	return 0;
-}
