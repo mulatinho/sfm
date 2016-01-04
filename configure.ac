@@ -3,6 +3,8 @@ AC_INIT([sfm], [0.01], [Alexandre Mulatinho <alex@mulatinho.net>])
 
 AM_INIT_AUTOMAKE(1.8)
 
+AC_CONFIG_SRCDIR([src/main.c])
+
 AC_CHECK_HEADERS([unistd.h])
 AC_CHECK_HEADERS([pthread.h])
 AC_CHECK_HEADERS([libsmbclient.h])
@@ -27,6 +29,8 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_LN_S
 AC_PROG_INSTALL
+AC_PROG_AWK
+AC_PROG_MAKE_SET
 
 PKG_PROG_PKG_CONFIG
 
