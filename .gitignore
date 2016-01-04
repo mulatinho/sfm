@@ -1,9 +1,11 @@
 *~
 *.o*
 .*
+autoscan.log
 sfm
 configure
 config.log
+configure.scan
 config.status
 Makefile
 Makefile.in

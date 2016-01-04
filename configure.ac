@@ -7,6 +7,16 @@ AC_CHECK_HEADERS([unistd.h])
 AC_CHECK_HEADERS([pthread.h])
 AC_CHECK_HEADERS([libsmbclient.h])
 AC_CHECK_HEADERS([curses.h])
+AC_CHECK_HEADERS([fcntl.h])
+
+AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([mkdir])
+AC_CHECK_FUNCS([strerror])
+
+AC_FUNC_FORK
+AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+AC_FUNC_MALLOC
+AC_TYPE_PID_T
 
 AC_CHECK_LIB(pthread, pthread_create)
 AC_CHECK_LIB(smbclient, smbc_opendir)
