@@ -19,6 +19,23 @@
 
 #include "main.h"
 
+#ifdef DEBUG
+int main(int argc, char **argv)
+{
+	int ret = 0;
+
+	ret = sfm_config_init();
+	fprintf(stdout, "sfm_config_init: %d\n", ret);
+
+	ret = sfm_config_load();
+	fprintf(stdout, "sfm_config_load: %d\n", ret);
+
+	ret = sfm_config_set("ui", "ncurses");
+	fprintf(stdout, "sfm_config_set : %d\n", ret);
+
+	return 0;
+}
+#else
 int main(int argc, char **argv)
 {
 	gint opt = 0;
@@ -45,3 +62,4 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+#endif

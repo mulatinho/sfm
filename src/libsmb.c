@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "main.h"
 #include <libsmbclient.h>
 
 int sfm_smb_list(SMBCCTX *smb, char *host)
@@ -141,7 +139,7 @@ int sfm_smb_exec(char *line)
 	return 0; 
 }
 
-#ifdef DEBUG
+/*#ifdef DEBUG
 int main(void) {
 	sfm_smb_exec("list smb://");
 	fprintf(stdout, "\n\n");
@@ -155,3 +153,4 @@ int main(void) {
 	return 0;
 }
 #endif
+*/

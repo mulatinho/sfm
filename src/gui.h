@@ -1,5 +1,8 @@
 #include "main.h"
 
+#ifndef _SFM_GUI_H_
+#define _SFM_GUI_H_
+
 static GtkItemFactoryEntry menu_items[] = {
 	{ "/_File", NULL, NULL, 0, "<Branch>", 0 },
 	{ "/File/_Open", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },
@@ -20,3 +23,5 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/About/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
 static int menu_items_n = sizeof(menu_items) / sizeof(menu_items[0]);
+
+#endif
