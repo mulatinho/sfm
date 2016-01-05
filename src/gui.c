@@ -180,6 +180,7 @@ void sfm_list_directory(void);
 void sfm_ncurses(void)
 {
 	struct sfm_ncurses *iface = malloc(sizeof(struct sfm_ncurses));
+	char root_items[FILENAME_MAX];
 	int user_input;
 
 	initscr();
@@ -200,11 +201,18 @@ void sfm_ncurses(void)
 
 	iface->sfmnroot = newwin(iface->lines-5, iface->cols-1, 3, 1);
 	box(iface->sfmnroot, 0, 0);
+
+	snprintf(root_items, sizeof(root_items)-1, "%-40s . %-6s . %-4s . %-3s . %-10s", 
+		"FILENAME", "SIZE", "TYPE", "UID", "PERMISSIONS");
+	attron(A_REVERSE|A_BOLD);
+	mvwprintw(iface->sfmnroot, 1, 1, root_items);
 	wrefresh(iface->sfmnroot);
+	attroff(A_REVERSE|A_BOLD);
 
 	iface->sfmnstatus = newwin(1, iface->cols-1, iface->lines-2, 1);
-	mvprintw(iface->sfmnstatus, 1, 1, 
-			":. Hello! Welcome to  .: %s :. iface->lines:%d, iface->cols:%d", 
+	wclear(iface->sfmnstatus);
+	mvwprintw(iface->sfmnstatus, 1, 1,
+			":. Hello! Welcome to .: %s :. lines:%d, cols:%d", 
 			SFM_VERSION, iface->lines, iface->cols);
 	wrefresh(iface->sfmnstatus); 
 
@@ -222,12 +230,22 @@ void sfm_ncurses(void)
 			break;
 		case 'Q':
 		case 'q':
-			wprintw(iface->sfmnstatus, ":. Are you sure you want to quit!? ");
+			wclear(iface->sfmnstatus);
+			wprintw(iface->sfmnstatus, ":. Are you sure you want to quit!? [Y/N] ");
 			wrefresh(iface->sfmnstatus);
-			sleep(1);
-
-			delwin(iface->sfmnroot);
-			goto sfm_ncurses_exit;
+			user_input = wgetch(iface->sfmnstatus);
+			switch (user_input) {
+			case 'y': case 'Y':
+			case 's': case 'S':
+				wclear(iface->sfmnstatus);
+				wprintw(iface->sfmnstatus, ":. Thanks for using SFM! :) Quitting...");
+				wrefresh(iface->sfmnstatus);
+				sleep(1);
+				delwin(iface->sfmnroot);
+				goto sfm_ncurses_exit;
+			default:
+				break;
+			}
 		}
 
 		wclear(iface->sfmnstatus);
