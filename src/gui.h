@@ -3,7 +3,7 @@
 #ifndef _SFM_GUI_H_
 #define _SFM_GUI_H_
 
-static GtkItemFactoryEntry menu_items[] = {
+static GtkItemFactoryEntry guimenu_items[] = {
 	{ "/_File", NULL, NULL, 0, "<Branch>", 0 },
 	{ "/File/_Open", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },
 	{ "/File/sep1", NULL, NULL, 0, "<Separator>", 0 },
@@ -22,6 +22,12 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/_About", NULL, NULL, 0, "<LastBranch>", 0 },
 	{ "/About/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
 };
-static int menu_items_n = sizeof(menu_items) / sizeof(menu_items[0]);
+static int guimenu_items_n = sizeof(guimenu_items) / sizeof(guimenu_items[0]);
+
+static char *menu_choices[] = {
+	"File", "Edit", "Execute", "Copy", "Paste",
+	"New Dir", "Help", "Exit", (char*)NULL,
+};
+static int menu_choices_n = sizeof(menu_choices) / sizeof(menu_choices[0]);
 
 #endif

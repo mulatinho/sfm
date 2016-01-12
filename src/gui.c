@@ -94,7 +94,7 @@ void sfm_gui(void)
 	gtk_window_add_accel_group(GTK_WINDOW(sfm.firstwin), sfm.accel_group);
 
 	sfm.item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", sfm.accel_group);
-	gtk_item_factory_create_items(sfm.item_factory, menu_items_n, menu_items, NULL);
+	gtk_item_factory_create_items(sfm.item_factory, guimenu_items_n, guimenu_items, NULL);
 
 	sfm.menu = gtk_item_factory_get_widget(sfm.item_factory, "<main>");
 	gtk_box_pack_start(GTK_BOX(sfm.level1), sfm.menu, FALSE, TRUE, 0);
@@ -179,50 +179,68 @@ void sfm_list_directory(void);
 
 void sfm_ncurses(void)
 {
+	int x;
 	struct sfm_ncurses *iface = malloc(sizeof(struct sfm_ncurses));
 	char root_items[FILENAME_MAX];
 	int user_input;
+	ITEM **ncmenu_items, *current_item;
+	MENU *sfm_menu;
 
 	initscr();
-	
+	start_color();	
 	noecho();
-
 	cbreak();
-	
+
 	getmaxyx(stdscr, iface->lines, iface->cols);
-
 	keypad(stdscr, TRUE);
-
 	refresh();
 
-	iface->sfmncmenu = newwin(3, iface->cols-1, 0, 1);
+	iface->sfmnroot = newwin(iface->lines-6, iface->cols-4, 0, 1);
+	snprintf(root_items, sizeof(root_items)-1, "%-40s . %-6s . %-4s . %-3s . %-10s", 
+		"FILENAME", "SIZE", "TYPE", "UID", "PERMISSIONS");
+	wattron(iface->sfmnroot, A_REVERSE|A_BOLD);
+	wprintw(iface->sfmnroot, root_items);
+	wattroff(iface->sfmnroot, A_REVERSE|A_BOLD);
+
+	for (x = 2; x < (iface->lines - 6); x++) {
+		snprintf(root_items, sizeof(root_items)-1, "Item line %2d                             . 55Kb   . .PDF . 100 . -rw-r--r--", x);
+		mvwprintw(iface->sfmnroot, x, 0, root_items);
+	}
+
+	wrefresh(iface->sfmnroot);
+
+	iface->sfmncmenu = newwin(3, iface->cols-1, iface->lines-5, 0);
+	ncmenu_items = calloc(menu_choices_n + 1, sizeof(ITEM *));
+	for (x = 0; x < menu_choices_n; ++x)
+		ncmenu_items[x] = new_item(menu_choices[x], menu_choices[x]);
+	ncmenu_items[menu_choices_n] = (ITEM *)NULL;
+
+	sfm_menu = new_menu((ITEM **)ncmenu_items);
+
+	keypad(iface->sfmncmenu, TRUE);
+	set_menu_win(ncmenu_items, iface->sfmncmenu);
+	menu_opts_off(sfm_menu, O_SHOWDESC);
+	set_menu_format(sfm_menu, 1, menu_choices_n);
+	post_menu(sfm_menu);
+	
 	box(iface->sfmncmenu, 0, 0);
 	wrefresh(iface->sfmncmenu);
 
-	iface->sfmnroot = newwin(iface->lines-5, iface->cols-1, 3, 1);
-	box(iface->sfmnroot, 0, 0);
-
-	snprintf(root_items, sizeof(root_items)-1, "%-40s . %-6s . %-4s . %-3s . %-10s", 
-		"FILENAME", "SIZE", "TYPE", "UID", "PERMISSIONS");
-	attron(A_REVERSE|A_BOLD);
-	mvwprintw(iface->sfmnroot, 1, 1, root_items);
-	wrefresh(iface->sfmnroot);
-	attroff(A_REVERSE|A_BOLD);
-
 	iface->sfmnstatus = newwin(1, iface->cols-1, iface->lines-2, 1);
-	wclear(iface->sfmnstatus);
-	mvwprintw(iface->sfmnstatus, 1, 1,
-			":. Hello! Welcome to .: %s :. lines:%d, cols:%d", 
-			SFM_VERSION, iface->lines, iface->cols);
+	wprintw(iface->sfmnstatus, ":. Hello! Welcome to .: %s :. lines:%d, cols:%d", 
+		SFM_VSN, iface->lines, iface->cols);
 	wrefresh(iface->sfmnstatus); 
 
 	while (1) {
+		keypad(stdscr, TRUE);
 		user_input = getch();
 
 		switch (user_input) {
 		case KEY_LEFT:
+			menu_driver(sfm_menu, REQ_LEFT_ITEM);
 			break;
 		case KEY_RIGHT:
+			menu_driver(sfm_menu, REQ_RIGHT_ITEM);
 			break;
 		case KEY_UP:
 			break;
@@ -254,6 +272,10 @@ void sfm_ncurses(void)
 	} 
 
 	sfm_ncurses_exit:
+	unpost_menu(sfm_menu);
+	free_menu(sfm_menu);
+	for(x = 0; x < menu_choices_n; ++x)
+		free_item(ncmenu_items[i]);
 	free(iface);
 	endwin();
 }
