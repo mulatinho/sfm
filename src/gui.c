@@ -275,7 +275,7 @@ void sfm_ncurses(void)
 	unpost_menu(sfm_menu);
 	free_menu(sfm_menu);
 	for(x = 0; x < menu_choices_n; ++x)
-		free_item(ncmenu_items[i]);
+		free_item(ncmenu_items[x]);
 	free(iface);
 	endwin();
 }
