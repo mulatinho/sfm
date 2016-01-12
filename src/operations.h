@@ -1,5 +1,8 @@
 #include "main.h"
 
+#ifndef _SFM_OPERATIONS_H_
+#define _SFM_OPERATIONS_H_
+
 void sfm_create_shortcut(GtkWidget*, gchar*);
 void sfm_create_shortcut(GtkWidget*, gchar*);
 void sfm_create_shortcut(GtkWidget*, gchar*);
@@ -13,3 +16,4 @@ void sfm_copy_file(GtkWidget*, gpointer);
 void sfm_open(GtkWidget*, gpointer);
 void sfm_execute(GtkWidget*, GdkEventButton*, gpointer);
 
+#endif
