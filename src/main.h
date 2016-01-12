@@ -34,16 +34,19 @@
 #include <gtk/gtk.h>
 #include <dirent.h>
 #include <ncurses.h>
+#include <menu.h>
 
 #include "operations.h"
 #include "util.h"
 #include "views.h"
 #include "gui.h"
 
-#define PROGNAME "SFM - (A Lightweight) Simple File Manager"
+#define PROGNAME "SFM"
+#define PROGDESC "A Lightweight Simple File Manager"
 #define PROGVERSION "0.01"
 #define PROGAUTHOR "Alexandre Mulatinho <alex at mulatinho dot net>"
 #define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
+#define SFM_VSN PROGNAME " v" PROGVERSION
 
 /* This three definitions will be deprecated, the idea is to user sqlite */
 #define SFM_IMAGES "./picz"
