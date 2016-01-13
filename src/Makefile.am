@@ -11,4 +11,4 @@ sfm_CFLAGS = -W -Wall -g -ggdb -pthread \
 	-I/usr/include/pixman-1 -I/usr/lib64/glib-2.0/include \
 	-I/usr/lib64/gtk-2.0/include -I/usr/lib/x86_64-linux-gnu/glib-2.0/include \
 	-I/usr/lib/x86_64-linux-gnu/gtk-2.0/include
-sfm_SOURCES = operations.c gui.c libsmb.c options.c main.c main.h util.c views.c
+sfm_SOURCES = operations.c gui.c console.c libsmb.c options.c main.c main.h util.c views.c

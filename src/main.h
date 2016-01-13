@@ -40,6 +40,7 @@
 #include "util.h"
 #include "views.h"
 #include "gui.h"
+#include "console.h"
 
 #define PROGNAME "SFM"
 #define PROGDESC "A Lightweight Simple File Manager"
