@@ -6,7 +6,8 @@ void sfm_ncurses(void)
 	struct sfm_ncurses *iface = malloc(sizeof(struct sfm_ncurses));
 	char root_items[FILENAME_MAX];
 	int user_input;
-	ITEM **ncmenu_items, *current_item;
+	WINDOW *current_window;
+	ITEM **ncmenu_items;
 	MENU *sfm_menu;
 
 	initscr();
@@ -15,48 +16,51 @@ void sfm_ncurses(void)
 	cbreak();
 
 	getmaxyx(stdscr, iface->lines, iface->cols);
-	keypad(stdscr, TRUE);
 	refresh();
 
-	iface->sfmnroot = newwin(iface->lines-6, iface->cols-4, 0, 1);
+	iface->sfmncmenu = newwin(3, iface->cols-1, iface->lines-5, 0);
+	keypad(iface->sfmncmenu, TRUE);
+	wmove(iface->sfmncmenu, 1, 1);
+	box(iface->sfmncmenu, 0, 0);
+
+	ncmenu_items = calloc(menu_choices_n, sizeof(ITEM *));
+	for (x = 0; x < menu_choices_n; x++)
+		ncmenu_items[x] = new_item(menu_choices[x], menu_choices[x]);
+	//ncmenu_items[menu_choices_n] = (ITEM *)NULL;
+
+	sfm_menu = new_menu((ITEM **)ncmenu_items);
+	menu_opts_off(sfm_menu, O_SHOWDESC);
+	set_menu_format(sfm_menu, 1, menu_choices_n);
+	set_menu_mark(sfm_menu, " ");
+	set_menu_win(sfm_menu, iface->sfmncmenu);
+	set_menu_sub(sfm_menu, derwin(iface->sfmncmenu, 1, iface->cols-2, 1, 1));
+	post_menu(sfm_menu);
+
+	//mvwprintw(iface->sfmncmenu, 1, 1, "heheeheheh");
+	wrefresh(iface->sfmncmenu);
+
+	iface->sfmnroot = newwin(iface->lines-6, iface->cols-4, 0, 0);
 	snprintf(root_items, sizeof(root_items)-1, "%-40s . %-6s . %-4s . %-3s . %-10s", 
 		"FILENAME", "SIZE", "TYPE", "UID", "PERMISSIONS");
 	wattron(iface->sfmnroot, A_REVERSE|A_BOLD);
 	wprintw(iface->sfmnroot, root_items);
 	wattroff(iface->sfmnroot, A_REVERSE|A_BOLD);
 
-	for (x = 2; x < (iface->lines - 6); x++) {
+	for (x = 1; x < (iface->lines - 6); x++) {
 		snprintf(root_items, sizeof(root_items)-1, "Item line %2d                             . 55Kb   . .PDF . 100 . -rw-r--r--", x);
 		mvwprintw(iface->sfmnroot, x, 0, root_items);
 	}
 
 	wrefresh(iface->sfmnroot);
 
-	iface->sfmncmenu = newwin(3, iface->cols-1, iface->lines-5, 0);
-	ncmenu_items = calloc(menu_choices_n + 1, sizeof(ITEM *));
-	for (x = 0; x < menu_choices_n; ++x)
-		ncmenu_items[x] = new_item(menu_choices[x], menu_choices[x]);
-	ncmenu_items[menu_choices_n] = (ITEM *)NULL;
-
-	sfm_menu = new_menu((ITEM **)ncmenu_items);
-
-	keypad(iface->sfmncmenu, TRUE);
-	set_menu_win(ncmenu_items, iface->sfmncmenu);
-	menu_opts_off(sfm_menu, O_SHOWDESC);
-	set_menu_format(sfm_menu, 1, menu_choices_n);
-	post_menu(sfm_menu);
-	
-	box(iface->sfmncmenu, 0, 0);
-	wrefresh(iface->sfmncmenu);
-
 	iface->sfmnstatus = newwin(1, iface->cols-1, iface->lines-2, 1);
 	wprintw(iface->sfmnstatus, ":. Hello! Welcome to .: %s :. lines:%d, cols:%d", 
 		SFM_VSN, iface->lines, iface->cols);
 	wrefresh(iface->sfmnstatus); 
 
+	current_window = iface->sfmncmenu;
 	while (1) {
-		keypad(stdscr, TRUE);
-		user_input = getch();
+		user_input = wgetch(current_window);
 
 		switch (user_input) {
 		case KEY_LEFT:
@@ -69,11 +73,28 @@ void sfm_ncurses(void)
 			break;
 		case KEY_DOWN:
 			break;
+		case 9:
+			if (current_window == iface->sfmncmenu)
+				current_window = iface->sfmnroot;
+			else
+				current_window = iface->sfmncmenu;
+		
+			keypad(current_window, TRUE);
+			break;
+		case 10:
+			{
+				ITEM *cur;
+				
+				cur = current_item(sfm_menu);
+				
+			}
+			break;
 		case 'Q':
 		case 'q':
 			wclear(iface->sfmnstatus);
 			wprintw(iface->sfmnstatus, ":. Are you sure you want to quit!? [Y/N] ");
 			wrefresh(iface->sfmnstatus);
+
 			user_input = wgetch(iface->sfmnstatus);
 			switch (user_input) {
 			case 'y': case 'Y':
@@ -82,7 +103,7 @@ void sfm_ncurses(void)
 				wprintw(iface->sfmnstatus, ":. Thanks for using SFM! :) Quitting...");
 				wrefresh(iface->sfmnstatus);
 				sleep(1);
-				delwin(iface->sfmnroot);
+
 				goto sfm_ncurses_exit;
 			default:
 				break;
@@ -95,10 +116,17 @@ void sfm_ncurses(void)
 	} 
 
 	sfm_ncurses_exit:
+	delwin(iface->sfmnroot);
+	delwin(iface->sfmnstatus);
+	delwin(iface->sfmncmenu);
+
 	unpost_menu(sfm_menu);
-	free_menu(sfm_menu);
-	for(x = 0; x < menu_choices_n; ++x)
+	free_menu(sfm_menu); 
+
+	for (x = 0; x < menu_choices_n; x++)
 		free_item(ncmenu_items[x]);
+
 	free(iface);
+
 	endwin();
 }

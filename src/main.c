@@ -38,8 +38,8 @@ int main(int argc, char **argv)
 #else
 int main(int argc, char **argv)
 {
-	gint opt = 0;
-	gint user = 0;
+	int opt = 0;
+	int user = 0;
 
 	while ((opt = getopt(argc, argv, "gnv")) != -1) {
 		switch (opt) {

@@ -11,4 +11,10 @@ struct sfm_ncurses {
 	int lines, cols;
 };
 
+static char *menu_choices[] = {
+	"Execute", "Edit", "New", "Copy", "Paste",
+	"Move", "Help", "Exit", (char*)NULL,
+};
+static int menu_choices_n = sizeof(menu_choices) / sizeof(menu_choices[0]);
+
 #endif
