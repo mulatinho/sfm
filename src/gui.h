@@ -24,10 +24,4 @@ static GtkItemFactoryEntry guimenu_items[] = {
 };
 static int guimenu_items_n = sizeof(guimenu_items) / sizeof(guimenu_items[0]);
 
-static char *menu_choices[] = {
-	"File", "Edit", "Execute", "Copy", "Paste",
-	"New Dir", "Help", "Exit", (char*)NULL,
-};
-static int menu_choices_n = sizeof(menu_choices) / sizeof(menu_choices[0]);
-
 #endif
