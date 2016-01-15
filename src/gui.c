@@ -63,6 +63,70 @@ void sfm_handle_rightview(GtkWidget *rightview)
 {
 }
 
+void sfm_gui_list_directory(int hidden)
+{
+	mfile *n = NULL;
+
+	if (sfm.viewport)
+		gtk_widget_destroy(sfm.viewport);
+
+	if (sfm.scroll)
+		gtk_widget_destroy(sfm.scroll);
+
+	if (sfm.fixedright)
+		gtk_widget_destroy(sfm.fixedright);
+
+	if (sfm.fileview)
+		gtk_widget_destroy(sfm.fileview);
+		
+	sfm.fileview = gtk_hbox_new(FALSE, 4);
+	gtk_widget_reparent(sfm.fileview, sfm.leftview);
+
+	sfm.scroll = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_shadow_type((GtkScrolledWindow*)sfm.scroll, GTK_SHADOW_NONE);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sfm.scroll),
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+
+	sfm.fixedright = gtk_fixed_new();
+
+	sfm.viewport = gtk_viewport_new(NULL,NULL);
+	gtk_viewport_set_shadow_type((GtkViewport*)sfm.viewport, GTK_SHADOW_NONE);
+
+	gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
+	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.viewport);
+
+	gtk_container_add(GTK_CONTAINER(sfm.viewport), sfm.fixedright);
+
+	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
+
+	n = list;
+	while (n != NULL) {
+		//TODO do the trick here.
+		n = (mfile*)n->next;
+	}
+
+	gtk_widget_show_all(sfm.firstwin);
+
+	return;
+}
+
+void sfm_warn_message(gchar *title, gchar *message, gint width, gint height)
+{
+	 GtkWidget *dialog, *label; 
+	 
+	 dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm.firstwin), 
+	 GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
+	 gtk_widget_set_usize(dialog, width, height);
+	 
+	 label = gtk_label_new (message);
+		 
+	 g_signal_connect_swapped (dialog, "response", 
+	 G_CALLBACK (gtk_widget_destroy), dialog);
+
+	 gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label); 
+	 gtk_widget_show_all (dialog);
+}
+
 void sfm_gui(void)
 {
 	gchar buf[FILENAME_MAX];
@@ -157,7 +221,7 @@ void sfm_gui(void)
 	gtk_box_pack_start(GTK_BOX(sfm.level4), sfm.statusbar, FALSE, TRUE, 1);
 	gtk_box_pack_start(GTK_BOX(sfm.level2), sfm.level4, FALSE, TRUE, 1);
 
-	sfm_scan_directory(1);
+	sfm_gui_list_directory(1);
 	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 
 	g_signal_connect(GTK_OBJECT(sfm.clist), "select_iface->lines", GTK_SIGNAL_FUNC(sfm_select_menu), NULL);
@@ -165,7 +229,4 @@ void sfm_gui(void)
 	g_signal_connect(G_OBJECT(sfm.firstwin), "delete_event", gtk_main_quit, NULL);
 
 	gtk_widget_show_all(sfm.firstwin);
-	gtk_main();
 }
-
-void sfm_list_directory(void);

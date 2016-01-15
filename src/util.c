@@ -19,13 +19,6 @@
 
 #include "main.h"
 
-struct mfile {
-	int id;
-	char fname[FILENAME_MAX];
-	struct stat st;
-	struct mfile *next;
-};
-
 /*
 char *sfm_bash_exec(char *cmd)
 {
@@ -135,105 +128,18 @@ void sfm_scan_directory(int hidden)
 {
 	struct dirent **files;
 	struct stat obj;
-	char *utf8;
-	int loop, xstat, x, y, filen, t, r;
-	int hsize, wsize;
-	char iconname[256], filename[256];
+	int count, n;
+	char filename[FILENAME_MAX];
 
-
-	BUFFER_ZERO(filename);
-	BUFFER_ZERO(iconname);
-
-	if (sfm.viewport)
-		gtk_widget_destroy(sfm.viewport);
-
-	if (sfm.scroll)
-		gtk_widget_destroy(sfm.scroll);
-
-	if (sfm.fixedright)
-		gtk_widget_destroy(sfm.fixedright);
-
-	if (sfm.fileview)
-		gtk_widget_destroy(sfm.fileview);
-		
-	sfm.fileview = gtk_hbox_new(FALSE, 4);
-	gtk_widget_reparent(sfm.fileview, sfm.leftview);
-
-	sfm.scroll = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_shadow_type((GtkScrolledWindow*)sfm.scroll, GTK_SHADOW_NONE);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sfm.scroll),
-		GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-
-	sfm.fixedright = gtk_fixed_new();
-
-	sfm.viewport = gtk_viewport_new(NULL,NULL);
-	gtk_viewport_set_shadow_type((GtkViewport*)sfm.viewport, GTK_SHADOW_NONE);
-
-	gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
-	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.viewport);
-
-	gtk_container_add(GTK_CONTAINER(sfm.viewport), sfm.fixedright);
-
-	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
-
-	xstat = scandir(sfm_current_path, &files, 0, alphasort);
+	count = scandir(sfm_current_path, &files, 0, alphasort);
 	
-	filen = 1;
-	for (loop = 0, y = 10; loop < xstat; loop++) {
-		utf8 = g_locale_to_utf8(files[loop]->d_name, 
-		strlen(files[loop]->d_name), NULL, NULL, NULL);
-		snprintf(filename, FILENAME_MAX, "%s/%s", sfm_current_path, utf8);
-
-		lstat(filename, &obj);
-		
-		/* Icon Y Axis */
-		if (!(filen % 4))
-			y += ICON_SZ_L;
-
-		/* Icon X Axis */
-		x = (filen % 4) * ICON_SZ_L;
-
-		for (r = 0, t = 0; t <= strlen(utf8); t++) {
-			if (!(t % ICON_SZ_S) && t != 0) {
-				iconname[r] = '\n';
-				r++;
-			}
-
-			iconname[r] = utf8[t];
-			r++;
-		}
-		
-		if (!hidden)
-			sfm_create_icon(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
-		else {
-			if ((utf8[0] == '.' && utf8[1] == '.') || utf8[0] != '.')
-				sfm_create_icon(sfm.fixedright, (char*)iconname, (char*)utf8, x, y);
-			else
-				filen--;
-		}
-
+	for (n = 0; n < count; n++) {
 		BUFFER_ZERO(filename);
-		filen++;
+		snprintf(filename, FILENAME_MAX, "%s/%s", sfm_current_path, files[n]->d_name);
+		stat(filename, &obj);
+
+		sfm_mfile_insert(&n, filename, &obj);
+		free(files[n]);
 	}
-
-	gtk_widget_show_all(sfm.firstwin);
-
-	return;
-}
-
-void sfm_warn_message(gchar *title, gchar *message, gint width, gint height)
-{
-	 GtkWidget *dialog, *label; 
-	 
-	 dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm.firstwin), 
-	 GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
-	 gtk_widget_set_usize(dialog, width, height);
-	 
-	 label = gtk_label_new (message);
-		 
-	 g_signal_connect_swapped (dialog, "response", 
-	 G_CALLBACK (gtk_widget_destroy), dialog);
-
-	 gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label); 
-	 gtk_widget_show_all (dialog);
+	free(files);
 }

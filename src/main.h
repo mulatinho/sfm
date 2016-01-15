@@ -36,6 +36,7 @@
 #include <ncurses.h>
 #include <menu.h>
 
+#include "memory.h"
 #include "operations.h"
 #include "util.h"
 #include "views.h"
