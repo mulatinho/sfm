@@ -3,6 +3,39 @@
 #ifndef _SFM_GUI_H_
 #define _SFM_GUI_H_
 
+typedef struct {
+	GtkWidget *firstwin;
+
+	GtkWidget *level1, *level2, *level3, *level4;
+	
+	GtkWidget *content, *leftview, *fileview;
+	
+	GtkWidget *menu, *logo, *statusbar;
+
+	GtkWidget *leftview_vbox;
+
+	GtkWidget *path_fixed, *path_entry, *path_label;
+
+	GtkWidget *shlabel, *clist, *clist_two;
+	
+	GtkWidget *scroll, *viewport, *icon_view;
+
+	GtkItemFactory *item_factory;
+
+	GtkAccelGroup *accel_group;
+} sfm_t;
+
+sfm_t sfm;
+
+enum {
+	ITEM_PATH,
+	ITEM_NAME,
+	ITEM_IMAGE,
+	ITEM_TYPE,
+	ITEM_SIZE,
+	ITEM_TOTAL
+};
+
 static GtkItemFactoryEntry guimenu_items[] = {
 	{ "/_File", NULL, NULL, 0, "<Branch>", 0 },
 	{ "/File/_Open", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },
