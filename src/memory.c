@@ -42,6 +42,9 @@ void sfm_mfile_free(void)
 	while (n != NULL) {
 		tmp = n;
 		n = (mfile*)n->next;
-		free(tmp);
+		if (tmp)
+			free(tmp);
 	}
+
+	list = NULL;
 }

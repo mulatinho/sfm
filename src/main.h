@@ -37,7 +37,6 @@
 #include <menu.h>
 
 #include "memory.h"
-#include "operations.h"
 #include "util.h"
 #include "views.h"
 #include "gui.h"
@@ -50,7 +49,7 @@
 #define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
 #define SFM_VSN PROGNAME " v" PROGVERSION
 
-/* This three definitions will be deprecated, the idea is to user sqlite */
+/* FIXME: This three definitions will be deprecated, freedesktop here!? */
 #define SFM_IMAGES "./picz"
 #define SFM_CONF "./sfm/sfm.conf" 
 #define SFM_CACHE "./sfm/cache" 
@@ -62,55 +61,5 @@
 #define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 
 char sfm_current_path[FILENAME_MAX];
-
-/* Some important functions */
-/*void sfm_init(void);
-void sfm_about(void);
-
-void sfm_handle_leftview(GtkWidget *leftview);
-
-void sfm_execute(GtkWidget *, GdkEventButton *, gpointer);
-void sfm_path_new(GtkWidget *, GdkEvent *, gpointer);
-void sfm_select_item(GtkWidget *, gint, gint); 
-void sfm_select_menu(GtkWidget *, gint, gint); 
-void sfm_scan_directory(int);
-	
-void sfm_run(GtkWidget *, gpointer);
-void sfm_open(GtkWidget *, gpointer);
-void sfm_copy_file(GtkWidget *, gpointer);
-void sfm_paste_file(GtkWidget *, gpointer);
-void sfm_preferences(GtkWidget *, gpointer);
-void sfm_view_list(GtkWidget *, gpointer);
-void sfm_view_icons(GtkWidget *, gpointer);
-void sfm_view_compact(GtkWidget *, gpointer);
-
-void sfm_link_event(GtkWidget *label, const gchar *uri, gpointer data);
-void sfm_link_home(GtkWidget *, const gchar *, gpointer);
-void sfm_link_network(GtkWidget *, const gchar *, gpointer);
-
-void sfm_handle_leftview(GtkWidget *);
-void sfm_warn_message(gchar *, gchar *, gint, gint); 
-
-static GtkItemFactoryEntry menu_items[] = {
-	{ "/_File", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/File/_Open", "<control>A", sfm_open, 0, "<StockItem>", GTK_STOCK_OPEN },
-	{ "/File/sep1", NULL, NULL, 0, "<Separator>", 0 },
-	{ "/File/_Exit", "<control>S", gtk_main_quit, 0, "<StockItem>", GTK_STOCK_QUIT },
-	{ "/_Edit", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/Edit/_Execute", "<control>E", sfm_run, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/Edit/sep1", NULL, NULL, 0, "<Separator>", 0 },
-	{ "/Edit/Copy", "<control>C", sfm_copy_file, 0, "<StockItem>", GTK_STOCK_COPY },
-	{ "/Edit/Cut", "<control>V", sfm_paste_file, 0, "<StockItem>", GTK_STOCK_CUT },
-	{ "/Edit/sep1", NULL, NULL, 0, "<Separator>", 0 },
-	{ "/Edit/_Preferences", NULL, sfm_preferences, 0, "<StockItem>", GTK_STOCK_PROPERTIES },
-	{ "/_View", NULL, NULL, 0, "<Branch>", 0 },
-	{ "/View/_List", "<control>E", sfm_view_list, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/View/_Compact", "<control>E", sfm_view_compact, 0, "<StockItem>", GTK_STOCK_EXECUTE },
-	{ "/View/Big _Icons", "<control>E", sfm_view_icons, 0, "<StockItem>", GTK_STOCK_ZOOM_100 },
-	{ "/_About", NULL, NULL, 0, "<LastBranch>", 0 },
-	{ "/About/_SFM", "<control>S", sfm_about, 0, "<StockItem>", GTK_STOCK_DIALOG_INFO },
-};
-static int menu_items_n = sizeof(menu_items) / sizeof(menu_items[0]);
-*/
 
 #endif

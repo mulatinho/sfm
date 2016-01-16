@@ -87,42 +87,6 @@ void sfm_exec_file(gchar *current_file)
 	}
 }
 
-GtkWidget *sfm_create_icon(GtkWidget *box, gchar *label, gchar *file, int x, int y)
-{
-	GtkWidget *vbox, *image, *label1, *eventbox;
-	gchar buf[FILENAME_MAX], filen[FILENAME_MAX];
-	struct stat obj;
-
-	eventbox = gtk_event_box_new();
-
-	snprintf(filen, FILENAME_MAX-1, "%s/%s", sfm_current_path, file);
-	lstat(filen, &obj);
-
-	if (S_ISDIR(obj.st_mode)) 
-		image = gtk_image_new_from_stock(GTK_STOCK_DIRECTORY, 
-			GTK_ICON_SIZE_DIALOG);
-		/* snprintf(buf, FILENAME_MAX-1, "%s/sfmfolder.png", SFM_IMAGES); */
-	else 
-		image = gtk_image_new_from_stock(GTK_STOCK_FILE,
-			GTK_ICON_SIZE_DIALOG);
-		/* snprintf(buf, FILENAME_MAX-1, "%s/sfmfile.png", SFM_IMAGES); */
-	
-	label1 = gtk_label_new(label);
-	gtk_widget_set_usize(GTK_WIDGET(label1), 125, 80);
-	gtk_label_set_justify(GTK_LABEL(label1), GTK_JUSTIFY_CENTER);
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(eventbox), image);
-	gtk_box_pack_start(GTK_BOX(vbox), eventbox, TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), label1, TRUE, TRUE, 0);
-
-	gtk_fixed_put(GTK_FIXED(box), vbox, x, y);
-
-	g_signal_connect(GTK_OBJECT(eventbox), "button_press_event", G_CALLBACK(sfm_execute), file);
-
-	return vbox;
-}
-
 extern int alphasort();
 void sfm_scan_directory(int hidden)
 {
@@ -145,22 +109,22 @@ void sfm_scan_directory(int hidden)
 	free(files);
 }
 
-void sfm_set_path(char *name)
+void sfm_set_current_path(const char *name)
 {
 	struct stat fstat;
 
 	stat(name, &fstat);
 
-	if (S_ISDIR(fstat.st_mode)) {
+	if (!S_ISDIR(fstat.st_mode)) {
+		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
+		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Error! Directory not found.");
+
+		gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
+	} else {		
 		BUFFER_ZERO(sfm_current_path);
 		snprintf(sfm_current_path, FILENAME_MAX-1, "%s", name);
 
 		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
 		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Well done!");
-	} else {
-		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
-		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Error! Directory not found.");
-
-		gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 	}
 }

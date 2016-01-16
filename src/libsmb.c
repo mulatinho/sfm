@@ -42,7 +42,7 @@ int sfm_smb_recv(SMBCCTX *smb, char *fName)
 	memset(fn, '\0', sizeof(fn));
 	for (i=strlen(fName); fName[i] != '/'; i--); i++;
 	
-	for (j=0; i<strlen(fName); j++, i++)
+	for (j=0; i < (int)strlen(fName); j++, i++)
 		fn[j] = fName[i];
 	
 	if ((rfd = smbc_open(fName, O_RDONLY, 0)) <= 0) {
@@ -94,7 +94,7 @@ int sfm_smb_exec(char *line)
 		return -1;
 	} 
 	
-	for (i=0,flag=0; i<strlen(line); i++) {
+	for (i=0,flag=0; i < (int)strlen(line); i++) {
 		if (!flag) {
 			if (line[i] == ' ')
 				flag++;

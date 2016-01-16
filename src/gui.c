@@ -30,6 +30,132 @@ void sfm_handle_localdir(GtkWidget *localdir)
 void sfm_handle_statusbar(GtkWidget *menubar)
 {
 }
+
+void sfm_run(GtkWidget *wid, gpointer data)
+{
+}
+
+void sfm_paste_file(GtkWidget *wid, gpointer data)
+{
+}
+
+void sfm_copy_file(GtkWidget *wid, gpointer data)
+{
+}
+
+void sfm_link_event(GtkWidget *label, const gchar *uri, gpointer data)
+{
+	gchar buf[NAME_MAX];
+
+	memset(buf, '\0', sizeof(buf));
+	memset(sfm_current_path, '\0', sizeof(sfm_current_path));
+	
+	fprintf(stdout, "label: '%s'\nuri: '%s'\nsfm_linkbutton\n", label, uri);
+
+	if (!strncmp(uri, "Home", strlen(uri))) {
+		char *env_home = getenv("HOME");
+		sfm_set_current_path(env_home);
+	} else if (!strncmp(uri, "Samba", strlen(uri))) {
+		fprintf(stdout, "sfm_linkbutton -> samba\n");
+	} else if (!strncmp(uri, "SSH", strlen(uri))) {
+		fprintf(stdout, "sfm_linkbutton -> ssh\n");
+	} else if (!strncmp(uri, "FTP", strlen(uri))) {
+		fprintf(stdout, "sfm_linkbutton -> ftp\n");
+	}
+	
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
+}
+
+void sfm_link_network(GtkWidget *label, const gchar *uri, gpointer data)
+{
+	fprintf(stdout, "sfm_linkbutton_network\n");
+}
+
+void sfm_select_menu(GtkWidget *wid, gint x, gint y) 
+{
+	gchar *text=NULL;
+	
+	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
+	
+	memset(sfm_current_path, '\0', NAME_MAX);
+// DEBUG
+	fprintf(stderr, "linha: %d. celula: %s\n", x, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
+	
+	if (!x) {
+		snprintf(sfm_current_path, NAME_MAX-1, "/");
+		//sfm_scan_directory(1);
+	} else if (x == 1) {
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", text);
+		//sfm_scan_directory(1);
+	} else if (x == 2) {
+		snprintf(sfm_current_path, NAME_MAX-1, "smb://");
+		sfm_smb_exec("list smb://");
+	} else if (x == 3) {
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", text);
+	}
+
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
+}
+
+void do_select(GtkWidget *wid, gint x, gint y) 
+{
+	gchar *text=NULL;
+	gchar filen[NAME_MAX], filep[NAME_MAX];
+	int i;
+
+	memset(filen, '\0', sizeof(filen));
+	memset(filep, '\0', sizeof(filep));
+
+	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
+	fprintf(stderr, "line: %d. cell: %s/%s . %s\n", x, sfm_current_path, text, g_locale_to_utf8(text,-1,NULL,NULL,NULL));
+
+	if (!strncmp(text,"..",2)) {
+		strcpy(filep, sfm_current_path);
+		
+		for (i=strlen(filep); filep[i]!='/'; i--)
+			filep[i] = '\0';
+		
+		if (i)
+			filep[i] = '\0';
+		
+		snprintf(filen, NAME_MAX-1, "%s", filep);
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", filen);
+		
+		fprintf(stderr, "DEBUG: %s . %s\n", sfm_current_path, filen);
+	} else {
+		snprintf(filen, NAME_MAX, "%s/%s", sfm_current_path, text);
+		snprintf(sfm_current_path, NAME_MAX-1, "%s", filen);
+		fprintf(stderr, "DEBUG: %s . %s\n", sfm_current_path, filen);
+	}
+	
+	gtk_clist_clear(GTK_CLIST(wid)); usleep(5);
+	
+	fprintf(stdout, "clikei.\n");
+
+	text=NULL;
+	gtk_widget_show_all(sfm.firstwin);
+}
+
+void sfm_open(GtkWidget *wid, gpointer p)
+{
+	GtkWidget *dialog;
+	
+	dialog = gtk_file_chooser_dialog_new("Selecione arquivo.",		 
+		GTK_WINDOW(wid), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, 
+		GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+	 
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+	{
+		char *filename;
+	 
+		filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+		//fixme: open file
+		g_free(filename);
+	}
+	 
+	gtk_widget_destroy(dialog); 
+}
+
 void sfm_handle_leftview(GtkWidget *leftview)
 {
 	GtkWidget *label, *label_two, *label_sc;
@@ -66,11 +192,9 @@ void sfm_handle_rightview(GtkWidget *rightview)
 void sfm_gui_list_directory(int hidden)
 {
 	GtkListStore *store = NULL;
+	GdkPixbuf *pixbuf = NULL;
 	GtkTreeIter iter;
 	mfile *n = NULL;
-
-	if (sfm.viewport)
-		gtk_widget_destroy(sfm.viewport);
 
 	if (sfm.scroll)
 		gtk_widget_destroy(sfm.scroll);
@@ -83,6 +207,7 @@ void sfm_gui_list_directory(int hidden)
 		
 	sfm.fileview = gtk_hbox_new(FALSE, 4);
 	gtk_widget_reparent(sfm.fileview, sfm.leftview);
+	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
 
 	sfm.scroll = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sfm.scroll), 
@@ -93,19 +218,29 @@ void sfm_gui_list_directory(int hidden)
 	gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
 
 	store = gtk_list_store_new(ITEM_TOTAL, G_TYPE_STRING, G_TYPE_STRING, 
-		GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING);
+		GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
 	gtk_list_store_clear(store);
 
-	n = list;
+	sfm_mfile_free();
+	sfm_scan_directory(hidden);
+
+	n = list; GError *gerror;
 	while (n != NULL) {
+		if (S_ISDIR(n->fstat.st_mode))
+			pixbuf = gdk_pixbuf_new_from_file("picz/sfmfolder.png", &gerror);
+		else
+			pixbuf = gdk_pixbuf_new_from_file("picz/sfmfile.png", &gerror);
+
 		gtk_list_store_append(store, &iter);
 		gtk_list_store_set(store, &iter, ITEM_PATH, sfm_current_path, 
-			ITEM_NAME, n->fname, ITEM_IMAGE, "picz/sfmfile.png", 
+			ITEM_NAME, n->fname, ITEM_IMAGE, pixbuf, 
 			ITEM_TYPE, n->fname+(strlen(n->fname)-3), 
 			ITEM_SIZE, n->fstat.st_size, -1);
 
-		fprintf(stdout, "%s\n", n->fname);
+		fprintf(stdout, ".:- %s\n", n->fname);
 		n = (mfile*)n->next;
+		g_object_unref(pixbuf);
+		pixbuf = NULL;
 	}
 
 	sfm.icon_view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(store));
@@ -113,13 +248,12 @@ void sfm_gui_list_directory(int hidden)
 		GTK_SELECTION_MULTIPLE);
 
 	gtk_icon_view_set_text_column(GTK_ICON_VIEW(sfm.icon_view), ITEM_NAME);
-	//gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(sfm.icon_view), ITEM_IMAGE);
+	gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(sfm.icon_view), ITEM_IMAGE);
 	gtk_icon_view_set_item_width(GTK_ICON_VIEW(sfm.icon_view), 96);
-	gtk_icon_view_set_columns(GTK_ICON_VIEW(sfm.icon_view), 3);
 
 	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.icon_view);
 
-	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
+	g_signal_connect(G_OBJECT(sfm.icon_view), "item-activated", G_CALLBACK(sfm_callback_execute), store);
 
 	gtk_widget_show_all(sfm.fileview);
 
@@ -128,21 +262,35 @@ void sfm_gui_list_directory(int hidden)
 	return;
 }
 
-void sfm_warn_message(gchar *title, gchar *message, gint width, gint height)
+void sfm_callback_execute(GtkIconView *iconview, 
+	GtkTreePath *treepath, 	gpointer user_data)
 {
-	 GtkWidget *dialog, *label; 
-	 
-	 dialog = gtk_dialog_new_with_buttons (title, GTK_WINDOW(sfm.firstwin), 
-	 GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
-	 gtk_widget_set_usize(dialog, width, height);
-	 
-	 label = gtk_label_new (message);
-		 
-	 g_signal_connect_swapped (dialog, "response", 
-	 G_CALLBACK (gtk_widget_destroy), dialog);
+	GtkListStore *store;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	gchar *item;
 
-	 gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label); 
-	 gtk_widget_show_all (dialog);
+	store = GTK_LIST_STORE(user_data);
+
+	gtk_tree_model_get_iter(GTK_TREE_MODEL(store), &iter, treepath);
+	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, ITEM_NAME, &item, -1);
+
+	fprintf(stdout, "-=> %s\n", item);
+}
+
+void sfm_callback_change_dir(GtkWidget *widget, GtkWidget *entry)
+{
+	const gchar *directory = gtk_entry_get_text(GTK_ENTRY(entry));
+	sfm_set_current_path(directory);
+	sfm_gui_list_directory(FILES_HIDDEN);
+}
+
+gboolean sfm_callback_exit(GtkWidget *widget, GdkEvent *event)
+{
+	sfm_mfile_free();
+	gtk_widget_destroy(sfm.firstwin);
+	sfm.firstwin = NULL;
+	gtk_main_quit();
 }
 
 void sfm_gui(void)
@@ -151,9 +299,6 @@ void sfm_gui(void)
 	gchar **text = NULL;
 
 	gtk_init(NULL, NULL);
-
-	BUFFER_ZERO(sfm_current_path);
-	snprintf(sfm_current_path, FILENAME_MAX-1, "%s", getenv("HOME"));
 
 	/* principal window */
 	sfm.firstwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -204,7 +349,7 @@ void sfm_gui(void)
 	gtk_label_set_use_markup (GTK_LABEL (sfm.shlabel), TRUE);
 	gtk_box_pack_start(GTK_BOX(sfm.level3), sfm.shlabel, FALSE, FALSE, 1);
 
-	sfm.clist = gtk_clist_new(1);
+/*	sfm.clist = gtk_clist_new(1);
 	gtk_clist_set_shadow_type(GTK_CLIST(sfm.clist), GTK_SHADOW_OUT);
 
 	text = malloc(FILENAME_MAX * 5); // FILENAME_MAX chars, 5 iface->lines
@@ -228,7 +373,7 @@ void sfm_gui(void)
 	gtk_widget_set_usize(GTK_WIDGET(sfm.clist), 200, 70);
 	gtk_box_pack_start(GTK_BOX(sfm.level3), sfm.clist, FALSE, TRUE, 1);
 	
-	free(text);
+	free(text); */
 
 	snprintf(buf, FILENAME_MAX-1, "%s/sfm.png", SFM_IMAGES);
 	sfm.logo = gtk_image_new_from_file(buf);
@@ -239,12 +384,12 @@ void sfm_gui(void)
 	gtk_box_pack_start(GTK_BOX(sfm.level4), sfm.statusbar, FALSE, TRUE, 1);
 	gtk_box_pack_start(GTK_BOX(sfm.level2), sfm.level4, FALSE, TRUE, 1);
 
-	sfm_gui_list_directory(1);
+	sfm_gui_list_directory(FILES_HIDDEN);
 	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 
-	g_signal_connect(GTK_OBJECT(sfm.clist), "select_iface->lines", GTK_SIGNAL_FUNC(sfm_select_menu), NULL);
-	g_signal_connect(GTK_OBJECT(sfm.path_entry), "key-press-event", GTK_SIGNAL_FUNC(sfm_path_new), NULL);
-	g_signal_connect(G_OBJECT(sfm.firstwin), "delete_event", gtk_main_quit, NULL);
+//	g_signal_connect(GTK_OBJECT(sfm.clist), "select", GTK_SIGNAL_FUNC(sfm_callback_select_menu), NULL);
+	g_signal_connect(G_OBJECT(sfm.firstwin), "delete_event", G_CALLBACK(sfm_callback_exit), NULL);
+	g_signal_connect(G_OBJECT(sfm.path_entry), "activate", G_CALLBACK(sfm_callback_change_dir), sfm.path_entry);
 
 	gtk_widget_show_all(sfm.firstwin);
 

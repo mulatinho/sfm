@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	int user = 0;
 	char *env_pwd = getenv("PWD");
 
-	sfm_set_path(env_pwd);
+	sfm_set_current_path(env_pwd);
 
 	while ((opt = getopt(argc, argv, "gnv")) != -1) {
 		switch (opt) {

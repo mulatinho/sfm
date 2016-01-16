@@ -10,15 +10,19 @@ typedef struct {
 	
 	GtkWidget *content, *leftview, *fileview;
 	
-	GtkWidget *menu, *logo, *statusbar;
+	GtkWidget *menu, *logo;
 
 	GtkWidget *leftview_vbox;
 
 	GtkWidget *path_fixed, *path_entry, *path_label;
 
-	GtkWidget *shlabel, *clist, *clist_two;
+	GtkWidget *shlabel;
 	
-	GtkWidget *scroll, *viewport, *icon_view;
+	GtkWidget *scroll, *icon_view;
+
+	GtkWidget *statusbar;
+
+	GtkCList *clist, clist_two;
 
 	GtkItemFactory *item_factory;
 
@@ -26,6 +30,19 @@ typedef struct {
 } sfm_t;
 
 sfm_t sfm;
+
+void sfm_create_shortcut(GtkWidget*, gchar*);
+void sfm_create_shortcut(GtkWidget*, gchar*);
+void sfm_create_shortcut(GtkWidget*, gchar*);
+void sfm_link_event(GtkWidget*, const gchar*, gpointer);
+void sfm_link_network(GtkWidget*, const gchar*, gpointer);
+void sfm_select_menu(GtkWidget*, gint, gint);
+void do_select(GtkWidget*, gint, gint);
+void sfm_run(GtkWidget*, gpointer);
+void sfm_paste_file(GtkWidget*, gpointer);
+void sfm_copy_file(GtkWidget*, gpointer);
+void sfm_open(GtkWidget*, gpointer);
+void sfm_callback_execute(GtkIconView*, GtkTreePath*, gpointer);
 
 enum {
 	ITEM_PATH,

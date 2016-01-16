@@ -16,6 +16,23 @@ void sfm_preferences(GtkWidget *wid, gpointer p)
 {
 }
 
+void sfm_warn_message(gchar *title, gchar *message, gint width, gint height)
+{
+	GtkWidget *dialog, *label; 
+	 
+	dialog = gtk_dialog_new_with_buttons(title, GTK_WINDOW(sfm.firstwin), 
+	GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
+	gtk_widget_set_usize(dialog, width, height);
+	 
+	label = gtk_label_new(message);
+		 
+	g_signal_connect_swapped(dialog, "response", 
+		G_CALLBACK(gtk_widget_destroy), dialog);
+
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label); 
+	gtk_widget_show_all(dialog);
+}
+
 void sfm_about(void)
 {
 	GtkWidget *about;

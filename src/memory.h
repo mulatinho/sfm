@@ -22,6 +22,6 @@ typedef struct {
 	struct mfile *next;
 } mfile;
 
-static mfile *list;
+mfile *list;// = NULL;
 
 #endif
