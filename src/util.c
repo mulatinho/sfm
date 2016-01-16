@@ -138,8 +138,23 @@ void sfm_scan_directory(int hidden)
 		snprintf(filename, FILENAME_MAX, "%s/%s", sfm_current_path, files[n]->d_name);
 		stat(filename, &obj);
 
-		sfm_mfile_insert(&n, filename, &obj);
+		sfm_mfile_insert(&n, files[n]->d_name, &obj);
 		free(files[n]);
 	}
 	free(files);
+}
+
+void sfm_set_path(char *name)
+{
+	struct stat fstat;
+
+	BUFFER_ZERO(sfm_current_path);
+	
+	stat(name, &fstat);
+	if (S_ISDIR(fstat))	
+		snprintf(sfm_current_path, FILENAME_MAX-1, "%s", name);
+	else {
+		gtk_statusbar_pop(sfm.statusbar, 1);
+		gtk_statusbar_push(sfm.statusbar, 1, "Diretorio nao existe");
+	}
 }
