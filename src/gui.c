@@ -46,7 +46,7 @@ void sfm_handle_leftview(GtkWidget *leftview)
 
 	// FIXME add personal menus here.
 
-	label_two = gtk_label_new("<b><a href=\"Samba\">Samba</a> | <a href=\"SSH\">SSH</a> | <a href=\"FTP\">FTP</a></b>");
+	label_two = gtk_label_new("<b><a href=\"Samba\">Samba</a> | <a href=\"SSH\">SSH</a> | <a href=\"FTP\">FTP</a> | <a href=\"LDAP\">LDAP</a></b>");
 	gtk_label_set_use_markup (GTK_LABEL (label_two), TRUE);
 	gtk_box_pack_start(GTK_BOX(leftview), label_two, FALSE, TRUE, 1);
 
@@ -65,6 +65,8 @@ void sfm_handle_rightview(GtkWidget *rightview)
 
 void sfm_gui_list_directory(int hidden)
 {
+	GtkListStore *store = NULL;
+	GtkTreeIter iter;
 	mfile *n = NULL;
 
 	if (sfm.viewport)
@@ -73,8 +75,8 @@ void sfm_gui_list_directory(int hidden)
 	if (sfm.scroll)
 		gtk_widget_destroy(sfm.scroll);
 
-	if (sfm.fixedright)
-		gtk_widget_destroy(sfm.fixedright);
+	if (sfm.icon_view)
+		gtk_widget_destroy(sfm.icon_view);
 
 	if (sfm.fileview)
 		gtk_widget_destroy(sfm.fileview);
@@ -83,27 +85,43 @@ void sfm_gui_list_directory(int hidden)
 	gtk_widget_reparent(sfm.fileview, sfm.leftview);
 
 	sfm.scroll = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_shadow_type((GtkScrolledWindow*)sfm.scroll, GTK_SHADOW_NONE);
+	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sfm.scroll), 
+		GTK_SHADOW_ETCHED_IN);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sfm.scroll),
-		GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-
-	sfm.fixedright = gtk_fixed_new();
-
-	sfm.viewport = gtk_viewport_new(NULL,NULL);
-	gtk_viewport_set_shadow_type((GtkViewport*)sfm.viewport, GTK_SHADOW_NONE);
+		GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
 	gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
-	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.viewport);
 
-	gtk_container_add(GTK_CONTAINER(sfm.viewport), sfm.fixedright);
-
-	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
+	store = gtk_list_store_new(ITEM_TOTAL, G_TYPE_STRING, G_TYPE_STRING, 
+		GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING);
+	gtk_list_store_clear(store);
 
 	n = list;
 	while (n != NULL) {
-		//TODO do the trick here.
+		gtk_list_store_append(store, &iter);
+		gtk_list_store_set(store, &iter, ITEM_PATH, sfm_current_path, 
+			ITEM_NAME, n->fname, ITEM_IMAGE, "picz/sfmfile.png", 
+			ITEM_TYPE, n->fname+(strlen(n->fname)-3), 
+			ITEM_SIZE, n->fstat.st_size, -1);
+
+		fprintf(stdout, "%s\n", n->fname);
 		n = (mfile*)n->next;
 	}
+
+	sfm.icon_view = gtk_icon_view_new_with_model(GTK_TREE_MODEL(store));
+	gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(sfm.icon_view), 
+		GTK_SELECTION_MULTIPLE);
+
+	gtk_icon_view_set_text_column(GTK_ICON_VIEW(sfm.icon_view), ITEM_NAME);
+	//gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(sfm.icon_view), ITEM_IMAGE);
+	gtk_icon_view_set_item_width(GTK_ICON_VIEW(sfm.icon_view), 96);
+	gtk_icon_view_set_columns(GTK_ICON_VIEW(sfm.icon_view), 3);
+
+	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.icon_view);
+
+	gtk_container_add(GTK_CONTAINER(sfm.leftview), sfm.fileview);
+
+	gtk_widget_show_all(sfm.fileview);
 
 	gtk_widget_show_all(sfm.firstwin);
 
@@ -229,4 +247,6 @@ void sfm_gui(void)
 	g_signal_connect(G_OBJECT(sfm.firstwin), "delete_event", gtk_main_quit, NULL);
 
 	gtk_widget_show_all(sfm.firstwin);
+
+	gtk_main();
 }
