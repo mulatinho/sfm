@@ -61,47 +61,6 @@
 
 #define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 
-typedef struct {
-	GtkWidget *firstwin;
-
-	GtkWidget *level1, *level2, *level3, *level4;
-	
-	GtkWidget *content, *leftview, *fileview;
-	
-	GtkWidget *menu, *logo, *statusbar;
-
-	GtkWidget *leftview_vbox;
-
-	GtkWidget *path_fixed, *path_entry, *path_label;
-
-	GtkWidget *shlabel, *clist, *clist_two;
-	
-	GtkWidget *scroll, *viewport, *fixedright;
-
-	GtkItemFactory *item_factory;
-
-	GtkAccelGroup *accel_group;
-} sfm_t;
-
-enum {
-	S_FILENMTR,
-	S_FILESIZE,
-	S_FILETYPE,
-	S_FILEMODF,
-	S_FILEPERM,
-	S_TRITEMS,
-} sfm_tree_items;
-
-enum {
-	S_FILENMIC,
-	S_FILENAME,
-	S_FILEPICT,
-	S_FILEDIRT,
-	S_ICITEMS
-} sfm_icon_items;
-
-/* Global Variables */
-sfm_t sfm;
 char sfm_current_path[FILENAME_MAX];
 
 /* Some important functions */
