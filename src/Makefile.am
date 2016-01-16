@@ -3,7 +3,7 @@ bin_PROGRAMS = sfm
 sfm_LDADD = -latk-1.0 -lcairo -lfontconfig -lfreetype -lgdk-x11-2.0 -lgdk_pixbuf-2.0 \
 	    -lgio-2.0 -lglib-2.0 -lgobject-2.0 -lgtk-x11-2.0 -lpango-1.0 \
 	    -lpangocairo-1.0 -lpangoft2-1.0 -lpthread -lsmbclient -lncurses -lmenu
-sfm_CFLAGS = -W -Wall -g -ggdb -pthread \
+sfm_CFLAGS = -W -g -ggdb -pthread \
 	-I/usr/include/samba-4.0 -I/usr/include/atk-1.0 -I/usr/include/cairo \
 	-I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 \
 	-I/usr/include/glib-2.0 -I/usr/include/gtk-2.0 -I/usr/include/harfbuzz \

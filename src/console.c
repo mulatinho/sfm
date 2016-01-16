@@ -3,11 +3,11 @@
 void sfm_ncurses(void)
 {
 	int x;
-	struct sfm_ncurses *iface = malloc(sizeof(struct sfm_ncurses));
+	sfm_ncurses_win *iface = malloc(sizeof(sfm_ncurses_win));
 	char root_items[FILENAME_MAX];
 	int user_input;
 	WINDOW *current_window;
-	ITEM **ncmenu_items;
+	ITEM **ncmenu_items = NULL;
 	MENU *sfm_menu;
 
 	initscr();
@@ -23,7 +23,7 @@ void sfm_ncurses(void)
 	wmove(iface->sfmncmenu, 1, 1);
 	box(iface->sfmncmenu, 0, 0);
 
-	ncmenu_items = calloc(menu_choices_n, sizeof(ITEM *));
+	ncmenu_items = malloc((menu_choices_n+1) * sizeof(ITEM *));
 	for (x = 0; x < menu_choices_n; x++)
 		ncmenu_items[x] = new_item(menu_choices[x], menu_choices[x]);
 	//ncmenu_items[menu_choices_n] = (ITEM *)NULL;
@@ -34,9 +34,8 @@ void sfm_ncurses(void)
 	set_menu_mark(sfm_menu, " ");
 	set_menu_win(sfm_menu, iface->sfmncmenu);
 	set_menu_sub(sfm_menu, derwin(iface->sfmncmenu, 1, iface->cols-2, 1, 1));
-	post_menu(sfm_menu);
+	post_menu(sfm_menu); 
 
-	//mvwprintw(iface->sfmncmenu, 1, 1, "heheeheheh");
 	wrefresh(iface->sfmncmenu);
 
 	iface->sfmnroot = newwin(iface->lines-6, iface->cols-4, 0, 0);
@@ -68,7 +67,7 @@ void sfm_ncurses(void)
 			break;
 		case KEY_RIGHT:
 			menu_driver(sfm_menu, REQ_RIGHT_ITEM);
-			break;
+			break; 
 		case KEY_UP:
 			break;
 		case KEY_DOWN:
@@ -83,9 +82,9 @@ void sfm_ncurses(void)
 			break;
 		case 10:
 			{
-				ITEM *cur;
+				//ITEM *cur;
 				
-				cur = current_item(sfm_menu);
+				//cur = current_item(sfm_menu);
 				
 			}
 			break;
@@ -126,7 +125,10 @@ void sfm_ncurses(void)
 	for (x = 0; x < menu_choices_n; x++)
 		free_item(ncmenu_items[x]);
 
+	free(ncmenu_items);
+
 	free(iface);
 
+	refresh();
 	endwin();
 }
