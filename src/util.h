@@ -5,7 +5,7 @@
 
 char *sfm_bash_exec(char*);
 int sfm_has_shortcuts(void);
-void sfm_path_new(GtkWidget*, GdkEvent*, gpointer);
+void sfm_path_set(char*);
 void sfm_exec_file(gchar*);
 extern int alphasort();
 void sfm_scan_directory(int);

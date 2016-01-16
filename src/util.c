@@ -113,7 +113,7 @@ GtkWidget *sfm_create_icon(GtkWidget *box, gchar *label, gchar *file, int x, int
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(eventbox), image);
-	gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(eventbox), TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), eventbox, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), label1, TRUE, TRUE, 0);
 
 	gtk_fixed_put(GTK_FIXED(box), vbox, x, y);
@@ -131,8 +131,9 @@ void sfm_scan_directory(int hidden)
 	int count, n;
 	char filename[FILENAME_MAX];
 
+	sfm_mfile_free();
+
 	count = scandir(sfm_current_path, &files, 0, alphasort);
-	
 	for (n = 0; n < count; n++) {
 		BUFFER_ZERO(filename);
 		snprintf(filename, FILENAME_MAX, "%s/%s", sfm_current_path, files[n]->d_name);
@@ -148,13 +149,18 @@ void sfm_set_path(char *name)
 {
 	struct stat fstat;
 
-	BUFFER_ZERO(sfm_current_path);
-	
 	stat(name, &fstat);
-	if (S_ISDIR(fstat))	
+
+	if (S_ISDIR(fstat.st_mode)) {
+		BUFFER_ZERO(sfm_current_path);
 		snprintf(sfm_current_path, FILENAME_MAX-1, "%s", name);
-	else {
-		gtk_statusbar_pop(sfm.statusbar, 1);
-		gtk_statusbar_push(sfm.statusbar, 1, "Diretorio nao existe");
+
+		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
+		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Well done!");
+	} else {
+		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
+		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Error! Directory not found.");
+
+		gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 	}
 }
