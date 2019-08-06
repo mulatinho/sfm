@@ -17,4 +17,8 @@ static char *menu_choices[] = {
 };
 static int menu_choices_n = sizeof(menu_choices) / sizeof(menu_choices[0]);
 
+void sfm_left_tree(void);
+void sfm_right_tree(void);
+void sfm_bottom_menu(void);
+
 #endif

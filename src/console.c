@@ -1,5 +1,8 @@
 #include "main.h"
 
+void sfm_left_tree(void);
+void sfm_left_tree(void);
+void sfm_left_tree(void);
 void sfm_ncurses(void)
 {
 	int x;

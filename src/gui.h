@@ -7,9 +7,9 @@ typedef struct {
 	GtkWidget *firstwin;
 
 	GtkWidget *level1, *level2, *level3, *level4;
-	
+
 	GtkWidget *content, *leftview, *fileview;
-	
+
 	GtkWidget *menu, *logo;
 
 	GtkWidget *leftview_vbox;
@@ -17,7 +17,7 @@ typedef struct {
 	GtkWidget *path_fixed, *path_entry, *path_label;
 
 	GtkWidget *shlabel;
-	
+
 	GtkWidget *scroll, *icon_view;
 
 	GtkWidget *statusbar;
