@@ -34,6 +34,19 @@ void sfm_mfile_list(int type)
 	}
 }
 
+struct mfile *sfm_mfile_search(char *name)
+{
+	mfile *n = NULL, *tmp = NULL;
+
+	n = list;
+	while (n != NULL) {
+	        if (!strncmp(n->fname, name, strlen(name)))
+                        return n;
+        }
+
+        return NULL;
+}
+
 void sfm_mfile_free(void)
 {
 	mfile *n = NULL, *tmp = NULL;

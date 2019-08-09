@@ -122,7 +122,7 @@ void sfm_set_current_path(const char *name)
 		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Error! Directory not found.");
 
 		gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
-	} else {		
+	} else {
 		BUFFER_ZERO(sfm_current_path);
 		snprintf(sfm_current_path, FILENAME_MAX-1, "%s", name);
 

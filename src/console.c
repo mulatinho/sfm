@@ -1,8 +1,9 @@
 #include "main.h"
 
 void sfm_left_tree(void);
-void sfm_left_tree(void);
-void sfm_left_tree(void);
+void sfm_right_tree(void);
+void sfm_down_menu(void);
+
 void sfm_ncurses(void)
 {
 	int x;
@@ -14,11 +15,12 @@ void sfm_ncurses(void)
 	MENU *sfm_menu;
 
 	initscr();
-	start_color();	
+	start_color();
 	noecho();
 	cbreak();
 
 	getmaxyx(stdscr, iface->lines, iface->cols);
+        fprintf(stdout, "lines: %d, columns: %d\n", iface->lines, iface->cols);
 	refresh();
 
 	iface->sfmncmenu = newwin(3, iface->cols-1, iface->lines-5, 0);
@@ -42,6 +44,7 @@ void sfm_ncurses(void)
 	wrefresh(iface->sfmncmenu);
 
 	iface->sfmnroot = newwin(iface->lines-6, iface->cols-4, 0, 0);
+
 	snprintf(root_items, sizeof(root_items)-1, "%-40s . %-6s . %-4s . %-3s . %-10s", 
 		"FILENAME", "SIZE", "TYPE", "UID", "PERMISSIONS");
 	wattron(iface->sfmnroot, A_REVERSE|A_BOLD);
@@ -72,7 +75,6 @@ void sfm_ncurses(void)
 			menu_driver(sfm_menu, REQ_RIGHT_ITEM);
 			break; 
 		case KEY_UP:
-			break;
 		case KEY_DOWN:
 			break;
 		case 9:
