@@ -1,0 +1,8 @@
+Package: sfm
+Version: 0.3
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Alexandre Mulatinho <alex@livredigital.com>
+Description: Simple File Manager
+Depends: libc6 (>= 2.2.1), libglib2.0-dev (>= 2.20.0), libglib2.0 (>= 2.20.0), libgtk2.0-dev (>= 2.20.0), libncurses-dev, libsmbclient-dev

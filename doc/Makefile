@@ -1,5 +1,5 @@
 # Documentation 
-MANPAGES = sfmgui.1 sfmnc.1
+MANPAGES = sfm.1
 TXTS = functions.txt
 
 all: man txts
