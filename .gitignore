@@ -1,6 +1,7 @@
 *~
 *.o*
 .*
+*.gz
 autoscan.log
 sfm
 configure

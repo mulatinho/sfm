@@ -1,0 +1,23 @@
+.\" Manpage for sfm.
+.\" Contact alex@livredigital.com to correct errors or typos.
+.TH man 1 "31 Jan 2025" "1.0" "sfm man page"
+.SH NAME
+sfm \- Simple File Manager 
+.SH SYNOPSIS
+sfm [--console]
+.SH DESCRIPTION
+sfm is lightweight file manager that can be used in Desktop using GTK library or in the console using NCURSES library.
+.SH OPTIONS
+Non-argument options that are duplicated either on the command line, in
+.SS "General options"
+.TP
+.BI \-C\  \fR,\ \fB\-\-console
+Use the NCURSES software version instead of GTK one.
+.TP
+.BI \-D\  directory \fR,\ \fB\-\-directory= directory
+Use this option to change the current directory
+.TP
+.BR \-d ", " \-\-debug
+Print debugging information.
+.SH AUTHOR
+Alexandre Mulatinho (alex@livredigital.com)
