@@ -4,8 +4,33 @@ void sfm_left_tree(void);
 void sfm_right_tree(void);
 void sfm_down_menu(void);
 
+void sfm_make_windows(void)
+{
+	sfm_ncurses_win *iface = malloc(sizeof(sfm_ncurses_win));
+
+	initscr();
+	start_color();
+	noecho();
+	cbreak();
+
+	getmaxyx(stdscr, iface->lines, iface->cols);
+
+	iface->sfmncmenu = newwin(3, iface->cols-1, iface->lines-5, 0);
+	keypad(iface->sfmncmenu, TRUE);
+	wmove(iface->sfmncmenu, 1, 1);
+	box(iface->sfmncmenu, 0, 0);
+
+        sleep(4);
+	free(iface);
+
+	refresh();
+	endwin();
+}
+
 void sfm_ncurses(void)
 {
+        sfm_make_windows();
+        /*
 	int x;
 	sfm_ncurses_win *iface = malloc(sizeof(sfm_ncurses_win));
 	char root_items[FILENAME_MAX];
@@ -61,7 +86,7 @@ void sfm_ncurses(void)
 	iface->sfmnstatus = newwin(1, iface->cols-1, iface->lines-2, 1);
 	wprintw(iface->sfmnstatus, ":. Hello! Welcome to .: %s :. lines:%d, cols:%d", 
 		SFM_VSN, iface->lines, iface->cols);
-	wrefresh(iface->sfmnstatus); 
+	wrefresh(iface->sfmnstatus);
 
 	current_window = iface->sfmncmenu;
 	while (1) {
@@ -73,16 +98,19 @@ void sfm_ncurses(void)
 			break;
 		case KEY_RIGHT:
 			menu_driver(sfm_menu, REQ_RIGHT_ITEM);
-			break; 
+			break;
 		case KEY_UP:
+			menu_driver(sfm_, REQ_UP_ITEM);
+                        break;
 		case KEY_DOWN:
+			menu_driver(sfm_menu, REQ_DOWN_ITEM);
 			break;
 		case 9:
 			if (current_window == iface->sfmncmenu)
 				current_window = iface->sfmnroot;
 			else
 				current_window = iface->sfmncmenu;
-		
+
 			keypad(current_window, TRUE);
 			break;
 		case 10:
@@ -136,4 +164,5 @@ void sfm_ncurses(void)
 
 	refresh();
 	endwin();
+        */
 }

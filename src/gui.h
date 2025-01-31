@@ -29,7 +29,7 @@ typedef struct {
 	GtkAccelGroup *accel_group;
 } sfm_t;
 
-sfm_t sfm;
+static sfm_t sfm;
 
 void sfm_create_shortcut(GtkWidget*, gchar*);
 void sfm_create_shortcut(GtkWidget*, gchar*);
@@ -43,6 +43,7 @@ void sfm_paste_file(GtkWidget*, gpointer);
 void sfm_copy_file(GtkWidget*, gpointer);
 void sfm_open(GtkWidget*, gpointer);
 void sfm_callback_execute(GtkIconView*, GtkTreePath*, gpointer);
+int sfm_smb_exec(char *);
 
 enum {
 	ITEM_PATH,

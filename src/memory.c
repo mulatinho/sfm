@@ -1,7 +1,6 @@
 #include "main.h"
 
-void sfm_mfile_insert(int *id, char *name, struct stat *stat)
-{
+void sfm_mfile_insert(int *id, char *name, struct stat *stat) {
 	mfile *new = malloc(sizeof(mfile));
 
 	if (!new)
@@ -34,7 +33,7 @@ void sfm_mfile_list(int type)
 	}
 }
 
-struct mfile *sfm_mfile_search(char *name)
+mfile *sfm_mfile_search(char *name)
 {
 	mfile *n = NULL, *tmp = NULL;
 

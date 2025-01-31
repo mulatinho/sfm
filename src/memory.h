@@ -22,6 +22,8 @@ typedef struct {
 	struct mfile *next;
 } mfile;
 
-mfile *list;// = NULL;
+static mfile *list;// = NULL;
 
+void sfm_mfile_free(void);
+void sfm_mfile_insert(int *, char *, struct stat *);
 #endif

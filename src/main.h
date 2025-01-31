@@ -51,7 +51,6 @@
 #define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
 #define SFM_VSN PROGNAME " v" PROGVERSION
 
-/* FIXME: This three definitions will be deprecated, freedesktop here!? */
 #define SFM_IMAGES "./picz"
 #define SFM_CONF "./sfm/sfm.conf" 
 #define SFM_CACHE "./sfm/cache" 
@@ -62,6 +61,9 @@
 
 #define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 
-char sfm_current_path[FILENAME_MAX];
+static char sfm_current_path[FILENAME_MAX];
+
+void sfm_gui(void);
+void sfm_ncurses(void);
 
 #endif
