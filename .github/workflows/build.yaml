@@ -1,0 +1,28 @@
+name: sfm
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/**'
+      - '.github/workflows/build'
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: [ "ubuntu-latest" ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: coursier/cache-action@v6.4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+      - name: publish in docker hub
+        run: |-
+          echo "$TOKEN" | docker login -u mulatinho --password-stdin
+          docker build -t mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER .
+          docker tag mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER mulatinho/sfm:latest
+          docker push mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER
+          docker push mulatinho/sfm:latest
+        env:
+          TOKEN: ${{ secrets.PAT_DOCKER }}
