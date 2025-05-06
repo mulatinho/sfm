@@ -1,0 +1,37 @@
+name: sfm
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/**'
+      - '.github/workflows/build'
+ workflow_call:
+    inputs:
+      version:
+        type: string
+        description: 'The version to release'
+        required: true
+
+jobs:
+  publish:
+    runs-on: [ "ubuntu-latest" ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: coursier/cache-action@v6.4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+      - name: publish in docker hub
+        run: |-
+          echo "$TOKEN" | gh auth login --with-token
+
+          docker pull mulatinho/sfm:latest
+          docker tag mulatinho/sfm:latest sfm
+          docker cp sfm:/usr/src/sfm/src/sfm ./sfm
+
+          gh release create "$VERSION" --generate-notes './sfm#Linux 64bit binary'
+        env:
+          TOKEN: ${{ secrets.PAT_GITHUB }}
+          VERSION: ${{ inputs.version }}
