@@ -1,11 +1,6 @@
-name: sfm
+name: release
+
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'src/**'
-      - '.github/workflows/build'
  workflow_call:
     inputs:
       version:
