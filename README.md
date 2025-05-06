@@ -1,3 +1,8 @@
+[![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](LICENSE)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](README.md#Contributing)
+![Build Status](https://github.com/mulatinho/sfm/actions/workflows/build/badge.svg)
+
+
 Simple File Manager [![Build Status](https://travis-ci.org/mulatinho/sfm.svg?branch=master)](http://travis-ci.org/mulatinho/sfm)
 ===================
 
@@ -24,5 +29,13 @@ SCREENSHOTS
 
 ![SFM00](https://mulatinho.files.wordpress.com/2015/12/sfm00.png)
 
-Written by
-Alexandre Mulatinho. <alex@mulatinho.net> 
+
+
+### [Contributing](#Contributing)
+
+```
+git clone https://github.com/mulatinho/sfm.git
+./autogen.sh && ./configure
+# edit your changes, and guarantee its working
+make
+# create a PR and wait for it get merged :-)

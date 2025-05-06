@@ -1,6 +1,5 @@
 *~
 *.o*
-.*
 *.gz
 autoscan.log
 sfm
