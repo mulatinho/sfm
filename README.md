@@ -1,7 +1,7 @@
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](LICENSE)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](README.md#Contributing)
 ![GH Action Build Status](https://github.com/mulatinho/sfm/actions/workflows/build.yaml/badge.svg)
-![Travis Build Status](https://travis-ci.org/mulatinho/sfm.svg?branch=master)](http://travis-ci.org/mulatinho/sfm)
+[![Travis Build Status](https://travis-ci.org/mulatinho/sfm.svg?branch=master)](http://travis-ci.org/mulatinho/sfm)
 
 
 Simple File Manager [![Build Status](https://travis-ci.org/mulatinho/sfm.svg?branch=master)](http://travis-ci.org/mulatinho/sfm)
