@@ -8,6 +8,11 @@ on:
         description: 'The version to release'
         required: true
  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: 'The version to release'
+        required: true
 
 jobs:
   publish:
