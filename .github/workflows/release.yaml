@@ -29,7 +29,7 @@ jobs:
           echo "$TOKEN" | gh auth login --with-token
 
           docker pull mulatinho/sfm:latest
-          docker tag mulatinho/sfm:latest sfm
+          docker run -d --name sfm mulatinho/sfm sleep 5
           docker cp sfm:/usr/src/sfm/src/sfm ./sfm
 
           gh release create "$VERSION" --generate-notes './sfm#Linux 64bit binary'
