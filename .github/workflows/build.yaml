@@ -3,10 +3,8 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'src/**'
-      - '.github/workflows/build'
   workflow_dispatch:
+
 jobs:
   publish:
     runs-on: [ "ubuntu-latest" ]
