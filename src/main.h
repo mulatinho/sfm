@@ -43,21 +43,20 @@
 #include "views.h"
 #include "gui.h"
 #include "console.h"
+#include "options.h"
 
-#define PROGNAME "SFM"
-#define PROGDESC "A Lightweight Simple File Manager"
-#define PROGVERSION "0.01"
+#define ICON_SZ_L 64
+#define ICON_SZ_M 32
+#define ICON_SZ_S 16
 #define PROGAUTHOR "Alexandre Mulatinho <alex at mulatinho dot net>"
+#define PROGDESC "A Lightweight Simple File Manager"
+#define PROGNAME "SFM"
+#define PROGVERSION "0.01"
+#define SFM_CACHE "./sfm/cache"
+#define SFM_CONF "./sfm/sfm.conf"
+#define SFM_IMAGES "./picz"
 #define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
 #define SFM_VSN PROGNAME " v" PROGVERSION
-
-#define SFM_IMAGES "./picz"
-#define SFM_CONF "./sfm/sfm.conf" 
-#define SFM_CACHE "./sfm/cache" 
-
-#define ICON_SZ_S 16
-#define ICON_SZ_M 32
-#define ICON_SZ_L 64 
 
 #define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 

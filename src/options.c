@@ -1,17 +1,6 @@
 #include "main.h"
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
-#define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
-*/
 #define SFM_CONFIG ".config/sfm/config"
-#define DEBUG(buffer) fprintf(stdout, "%s\n", buffer)
 
 int sfm_config_init(void)
 {
@@ -19,37 +8,46 @@ int sfm_config_init(void)
 	char *ENV_HOME = getenv("HOME");
 	char realfile[FILENAME_MAX];
 
-	for (i=0; i<2; i++) {
+	for (i = 0; i < 2; i++)
+	{
 		BUFFER_ZERO(realfile);
 
-		if (!i) 
-			snprintf(realfile, FILENAME_MAX-1, 
-				"%s/%s", ENV_HOME, ".config");
-		else 
-			snprintf(realfile, FILENAME_MAX-1, 
-				"%s/%s", ENV_HOME, ".config/sfm");
+		if (!i)
+			snprintf(realfile, FILENAME_MAX - 1,
+					 "%s/%s", ENV_HOME, ".config");
+		else
+			snprintf(realfile, FILENAME_MAX - 1,
+					 "%s/%s", ENV_HOME, ".config/sfm");
 
-		if (mkdir(realfile, S_IRWXU) == -1) {
-			if (errno != EEXIST) {
-				fprintf(stderr, ".: error creating '%s' - %d - %s\n", 
-					realfile, errno, strerror(errno));
+		if (mkdir(realfile, S_IRWXU) == -1)
+		{
+			if (errno != EEXIST)
+			{
+				fprintf(stderr, ".: error creating '%s' - %d - %s\n",
+						realfile, errno, strerror(errno));
 				return -1;
 			}
 		}
 	}
 
 	BUFFER_ZERO(realfile);
-	snprintf(realfile, FILENAME_MAX-1, "%s/%s", ENV_HOME, SFM_CONFIG);
+	snprintf(realfile, FILENAME_MAX - 1, "%s/%s", ENV_HOME, SFM_CONFIG);
 
-	if ((fd = open(realfile, O_RDONLY)) == -1) {
-		if ((fd = open(realfile, O_CREAT, S_IWUSR|S_IRUSR)) == -1) {
-			fprintf(stderr, ".: error creating '%s' - %d - %s\n", 
-				realfile, errno, strerror(errno));
+	if ((fd = open(realfile, O_RDONLY)) == -1)
+	{
+		if ((fd = open(realfile, O_CREAT, S_IWUSR | S_IRUSR)) == -1)
+		{
+			fprintf(stderr, ".: error creating '%s' - %d - %s\n",
+					realfile, errno, strerror(errno));
 			return -1;
-		} else {
+		}
+		else
+		{
 			close(fd);
 		}
-	} else {
+	}
+	else
+	{
 		close(fd);
 	}
 
@@ -70,17 +68,16 @@ int sfm_config_load(void)
 	char line[FILENAME_MAX];
 
 	BUFFER_ZERO(realfile);
-	snprintf(realfile, FILENAME_MAX-1, "%s/%s", ENV_HOME, SFM_CONFIG);
+	snprintf(realfile, FILENAME_MAX - 1, "%s/%s", ENV_HOME, SFM_CONFIG);
 
-	if ((fp = fopen(realfile, "r")) != NULL) {
-		while (fgets(line, sizeof(line)-1, fp)) {
+	if ((fp = fopen(realfile, "r")) != NULL)
+	{
+		while (fgets(line, sizeof(line) - 1, fp))
+		{
 			fprintf(stdout, "%s", line);
-
-			
 		}
 		fclose(fp);
 	}
-	
+
 	return 0;
 }
-

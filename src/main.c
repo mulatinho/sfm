@@ -21,11 +21,12 @@
 
 #include "main.h"
 
-#ifdef DEBUG
 int main(int argc, char **argv)
 {
-	int ret = 0;
+	int ret, opt = 0;
+	char *env_pwd = getenv("PWD");
 
+#ifdef DEBUG
 	ret = sfm_config_init();
 	fprintf(stdout, "sfm_config_init: %d\n", ret);
 
@@ -34,23 +35,19 @@ int main(int argc, char **argv)
 
 	ret = sfm_config_set("ui", "ncurses");
 	fprintf(stdout, "sfm_config_set : %d\n", ret);
-
-	return 0;
-}
-#else
-int main(int argc, char **argv)
-{
-	int opt = 0;
-	char *env_pwd = getenv("PWD");
+#endif
 
 	sfm_set_current_path(env_pwd);
 
-	if (argc <= 1) {
+	if (argc <= 1)
+	{
 		sfm_gui();
 		return 0;
 	}
-	while ((opt = getopt(argc, argv, "gnv")) != -1) {
-		switch (opt) {
+	while ((opt = getopt(argc, argv, "gnv")) != -1)
+	{
+		switch (opt)
+		{
 		case 'u':
 		case 'h':
 			// user and hostname, future.
@@ -62,13 +59,12 @@ int main(int argc, char **argv)
 			fprintf(stdout, SFM_VERSION);
 			break;
 		default:
-                        fprintf(stdout,
-			  "usage: %s [-n ncurses|-g graphical|-v version]\n",
-                           argv[0]);
+			fprintf(stdout,
+					"usage: %s [-n ncurses|-g graphical|-v version]\n",
+					argv[0]);
 			return 1;
 		}
 	}
 
 	return 0;
 }
-#endif
