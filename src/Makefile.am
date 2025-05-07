@@ -7,7 +7,7 @@ sfm_LDADD = \
 	$(NCURSES_LIBS)
 	-lpthread
 
-sfm_CFLAGS = -O0 -W -g -ggdb -pthread \
+sfm_CFLAGS = -O0 -DDEBUG=1 -W -g -ggdb -pthread \
 	$(GTK_CFLAGS) \
 	$(SMBCLIENT_CFLAGS) \
 	$(NCURSES_CFLAGS)

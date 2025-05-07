@@ -1,6 +1,9 @@
 *~
 *.o*
 *.gz
+*.sub
+*.guess
+.deps
 autoscan.log
 sfm
 configure
