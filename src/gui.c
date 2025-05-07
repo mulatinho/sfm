@@ -105,10 +105,10 @@ void sfm_select_menu(GtkWidget *wid, gint option, gint y)
 	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_get_current_path());
 }
 
-void do_select(GtkWidget *wid, gint x, gint y)
+/* void do_select(GtkWidget *wid, gint x, gint y)
 {
 	gchar *text = NULL;
-	gchar filen[NAME_MAX], filep[NAME_MAX];
+	gchar filen[FILENAME_MAX], filep[FILENAME_MAX];
 	int i;
 
 	BUFFER_ZERO(filen);
@@ -121,20 +121,10 @@ void do_select(GtkWidget *wid, gint x, gint y)
 	{
 		strcpy(filep, sfm_get_current_path());
 
-		for (i = strlen(filep); filep[i] != '/'; i--)
-			filep[i] = '\0';
-
-		if (i)
-			filep[i] = '\0';
-
-		snprintf(filen, strlen(filep), "%s", filep);
-
-		fprintf(stderr, "DEBUG: %s . %s\n", sfm_get_current_path(), filen);
-	}
-	else
-	{
-		snprintf(filen, NAME_MAX, "%s/%s", sfm_get_current_path(), text);
+		snprintf(filen, strlen(filep), "%s", dirname(filep));
+		fprintf(stdout, "%s\n", filen);
 		sfm_set_current_path(filen);
+
 		fprintf(stderr, "DEBUG: %s . %s\n", sfm_get_current_path(), filen);
 	}
 
@@ -146,7 +136,7 @@ void do_select(GtkWidget *wid, gint x, gint y)
 	text = NULL;
 	gtk_widget_show_all(sfm.firstwin);
 }
-
+*/
 void sfm_open(GtkWidget *wid, gpointer p)
 {
 	GtkWidget *dialog;
@@ -209,7 +199,7 @@ void sfm_gui_list_directory(int hidden)
 	mfile *file_list = NULL;
 
 	GdkPixbuf *pixbuf_directory = gdk_pixbuf_new_from_file("picz/sfmfolder.png", &gerror);
-	GdkPixbuf *pixbuf_file = gdk_pixbuf_new_from_file("picz/sfmfolder.png", &gerror);
+	GdkPixbuf *pixbuf_file = gdk_pixbuf_new_from_file("picz/sfmfile.png", &gerror);
 
 	if (sfm.scroll)
 		gtk_widget_destroy(sfm.scroll);
@@ -236,8 +226,6 @@ void sfm_gui_list_directory(int hidden)
 							   GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
 	gtk_list_store_clear(store);
 
-	fprintf(stdout, "HEYHEY - %s -- sfm_current_path: %s\n", __FILE__, sfm_get_current_path());
-	fprintf(stdout, "HEYHEY - %s -- sizeofList: %d\n", __FILE__, sizeof(list));
 	file_list = list;
 	while (file_list != NULL)
 	{
@@ -254,7 +242,6 @@ void sfm_gui_list_directory(int hidden)
 						   SFM_ITEM_TYPE, file_list->fname + (strlen(file_list->fname) - 3),
 						   SFM_ITEM_SIZE, file_list->fstat.st_size, -1);
 
-		fprintf(stdout, ":. %s:%d -- listfile: %s\n", __FILE__, __LINE__, file_list->fname);
 		file_list = (mfile *)file_list->next;
 		g_object_unref(pixbuf);
 		pixbuf = NULL;
@@ -286,6 +273,7 @@ void sfm_callback_execute(GtkIconView *iconview,
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 	gchar *item;
+	struct stat obj;
 
 	store = GTK_LIST_STORE(user_data);
 
@@ -293,6 +281,23 @@ void sfm_callback_execute(GtkIconView *iconview,
 	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, SFM_ITEM_NAME, &item, -1);
 
 	fprintf(stdout, "-=> %s\n", item);
+	
+	stat(item, &obj);
+	if (S_ISDIR(obj.st_mode)) {
+		char directory[FILENAME_MAX];
+		BUFFER_ZERO(directory);
+		if (!strncmp(item, "..", strlen(item)))
+			snprintf(directory, FILENAME_MAX - 1, "%s", dirname(sfm_get_current_path()));
+		else if (!strncmp(item, ".", strlen(item))) {
+			item[strlen(item)-1] = '\0';
+			snprintf(directory, FILENAME_MAX - 1, "%s/%s", sfm_get_current_path(), item);
+		} else
+			snprintf(directory, FILENAME_MAX - 1, "%s/%s", sfm_get_current_path(), item);
+		
+		fprintf(stdout, "-=> %s:%d -> directory: %s\n", __FILE__, __LINE__, directory);
+		sfm_set_current_path(directory);
+	} else 
+		sfm_exec_file(item);
 }
 
 void sfm_callback_change_dir(GtkWidget *widget, GtkWidget *entry)

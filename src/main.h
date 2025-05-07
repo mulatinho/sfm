@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <gtk/gtk.h>
+#include <libgen.h>
 #include <linux/limits.h>
 #include <menu.h>
 #include <ncurses.h>

@@ -37,10 +37,7 @@ int main(int argc, char **argv)
 	fprintf(stdout, "sfm_config_set : %d\n", ret);
 #endif
 
-	fprintf(stdout, "1.==> env_pwd: %s\n1.==>    home: %s\n", env_pwd, sfm_get_current_path());
 	sfm_set_current_path(env_pwd);
-
-	fprintf(stdout, "2.==> env_pwd: %s\n2.==>    home: %s\n", env_pwd, sfm_get_current_path());
 
 	if (argc <= 1)
 	{

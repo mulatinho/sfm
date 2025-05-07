@@ -23,6 +23,7 @@
 
 char sfm_current_path[FILENAME_MAX];
 mfile *list;
+sfm_t sfm;
 
 /*
 char *sfm_bash_exec(char *cmd)
@@ -109,13 +110,13 @@ void sfm_scan_directory(int hidden)
 	for (n = 0; n < count; n++)
 	{
 		BUFFER_ZERO(filename);
+		if (!strncmp(files[n]->d_name, ".", strlen(files[n]->d_name)))
+			continue;
+
 		snprintf(filename, FILENAME_MAX, "%s/%s", sfm_current_path, files[n]->d_name);
 		stat(filename, &obj);
 
 		sfm_mfile_insert(&n, files[n]->d_name, &obj);
-		// #ifdef DEBUG
-		//		fprintf(stdout, "fname(%.4d): %s\n", n, filename);
-		// #endif
 		free(files[n]);
 	}
 	free(files);
@@ -136,15 +137,19 @@ void sfm_set_current_path(char *name)
 	{
 		BUFFER_ZERO(sfm_current_path);
 		snprintf(sfm_current_path, FILENAME_MAX - 1, "%s", name);
+		if (chdir(sfm_current_path)) {
+			gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
+			gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Error! Directory not found.");
+		}
 		sfm_scan_directory(SFM_FILES_ALL);
 		sfm_gui_list_directory(SFM_FILES_ALL);
+		gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 
 		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
 		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Well done!");
 	}
 
 	fprintf(stdout, "%s:%d -- %s\n", __FILE__, __LINE__, sfm_current_path);
-	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 	// sfm_debug(name);
 }
 
