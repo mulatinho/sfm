@@ -22,28 +22,28 @@
 #ifndef _SFM_CORE_H_
 #define _SFM_CORE_H_
 
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <gtk/gtk.h>
+#include <linux/limits.h>
+#include <menu.h>
+#include <ncurses.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <pthread.h>
-#include <linux/limits.h>
-#include <gtk/gtk.h>
-#include <dirent.h>
-#include <ncurses.h>
-#include <menu.h>
 
+#include "console.h"
+#include "gui.h"
 #include "memory.h"
+#include "options.h"
 #include "util.h"
 #include "views.h"
-#include "gui.h"
-#include "console.h"
-#include "options.h"
 
 #define ICON_SZ_L 64
 #define ICON_SZ_M 32
@@ -51,16 +51,12 @@
 #define PROGAUTHOR "Alexandre Mulatinho <alex at mulatinho dot net>"
 #define PROGDESC "A Lightweight Simple File Manager"
 #define PROGNAME "SFM"
-#define PROGVERSION "0.01"
+#define PROGVERSION "1.0.7"
 #define SFM_CACHE "./sfm/cache"
 #define SFM_CONF "./sfm/sfm.conf"
 #define SFM_IMAGES "./picz"
 #define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
 #define SFM_VSN PROGNAME " v" PROGVERSION
-
-#define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
-
-static char sfm_current_path[FILENAME_MAX];
 
 void sfm_gui(void);
 void sfm_ncurses(void);

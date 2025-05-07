@@ -1,6 +1,8 @@
 #include "main.h"
 #include <libsmbclient.h>
 
+#define SMB_PREFIX "smb://"
+
 int sfm_smb_list(SMBCCTX *smb, char *host)
 {
 	int dirfd;

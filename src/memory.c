@@ -1,4 +1,4 @@
-#include "main.h"
+#include "memory.h"
 
 void sfm_mfile_insert(int *id, char *name, struct stat *stat)
 {
@@ -27,24 +27,24 @@ void sfm_mfile_insert(int *id, char *name, struct stat *stat)
 
 void sfm_mfile_list(int type)
 {
-	mfile *n = list;
+	mfile *next_file = list;
 
-	while (n != NULL)
+	while (next_file != NULL)
 	{
-		fprintf(stdout, "%4d %6lu %s\n", n->id, n->fstat.st_size, n->fname);
-		n = (mfile *)n->next;
+		fprintf(stdout, "%4d %6lu %s\n", next_file->id, next_file->fstat.st_size, next_file->fname);
+		next_file = (mfile *)next_file->next;
 	}
 }
 
 mfile *sfm_mfile_search(char *name)
 {
-	mfile *n = NULL, *tmp = NULL;
+	mfile *next_file = NULL, *tmp = NULL;
 
-	n = list;
-	while (n != NULL)
+	next_file = list;
+	while (next_file != NULL)
 	{
-		if (!strncmp(n->fname, name, strlen(name)))
-			return n;
+		if (!strncmp(next_file->fname, name, strlen(name)))
+			return next_file;
 	}
 
 	return NULL;
@@ -52,16 +52,17 @@ mfile *sfm_mfile_search(char *name)
 
 void sfm_mfile_free(void)
 {
-	mfile *n = NULL, *tmp = NULL;
+	mfile *next_file = NULL, *tmp = NULL;
 
-	n = list;
-	while (n != NULL)
+	next_file = list;
+	while (next_file != NULL)
 	{
-		tmp = n;
-		n = (mfile *)n->next;
+		tmp = next_file;
+		next_file = (mfile *)next_file->next;
 		if (tmp)
 			free(tmp);
 	}
 
 	list = NULL;
+	next_file = NULL;
 }

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 // MA 02110-1301, USA.
 
-#include "main.h"
+#include "gui.h"
 
 void sfm_handle_menubar(GtkWidget *menubar)
 {
@@ -45,12 +45,7 @@ void sfm_copy_file(GtkWidget *wid, gpointer data)
 
 void sfm_link_event(GtkWidget *label, const gchar *uri, gpointer data)
 {
-	gchar buf[NAME_MAX];
-
-	memset(buf, '\0', sizeof(buf));
-	memset(sfm_current_path, '\0', sizeof(sfm_current_path));
-
-	fprintf(stdout, "uri: '%s'\nsfm_linkbutton\n", label, uri);
+	fprintf(stdout, "%s:%d  -- uri: '%s'\nsfm_link_event\n", __FILE__, __LINE__, uri);
 
 	if (!strncmp(uri, "Home", strlen(uri)))
 	{
@@ -70,7 +65,7 @@ void sfm_link_event(GtkWidget *label, const gchar *uri, gpointer data)
 		fprintf(stdout, "sfm_linkbutton -> ftp\n");
 	}
 
-	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_get_current_path());
 }
 
 void sfm_link_network(GtkWidget *label, const gchar *uri, gpointer data)
@@ -78,38 +73,36 @@ void sfm_link_network(GtkWidget *label, const gchar *uri, gpointer data)
 	fprintf(stdout, "sfm_linkbutton_network\n");
 }
 
-void sfm_select_menu(GtkWidget *wid, gint x, gint y)
+void sfm_select_menu(GtkWidget *wid, gint option, gint y)
 {
 	gchar *text = NULL;
+	char current_path[FILENAME_MAX];
 
-	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
+	gtk_clist_get_text(GTK_CLIST(wid), option, y, &text);
 
-	memset(sfm_current_path, '\0', NAME_MAX);
-	// DEBUG
-	fprintf(stderr, "linha: %d. celula: %s\n", x, g_locale_to_utf8(text, -1, NULL, NULL, NULL));
+	BUFFER_ZERO(current_path);
+	fprintf(stderr, "%s:%d -- line: %d. cell: %s\n", __FILE__, __LINE__, option, g_locale_to_utf8(text, -1, NULL, NULL, NULL));
 
-	if (!x)
+	switch (option)
 	{
-		snprintf(sfm_current_path, NAME_MAX - 1, "/");
-		// sfm_scan_directory(1);
-	}
-	else if (x == 1)
-	{
-		snprintf(sfm_current_path, NAME_MAX - 1, "%s", text);
-		// sfm_scan_directory(1);
-	}
-	else if (x == 2)
-	{
-		snprintf(sfm_current_path, NAME_MAX - 1, "smb://");
+	case 0:
+		snprintf(current_path, strlen(SFM_PREFIX_ROOT), "%s", SFM_PREFIX_ROOT);
+		break;
+	case 1:
+	case 3:
+		snprintf(current_path, strlen(text), "%s", text);
+		break;
+	case 2:
+		snprintf(current_path, strlen(SFM_PREFIX_SMB), "%s", SFM_PREFIX_SMB);
 		sfm_smb_exec("list smb://");
-	}
-	else if (x == 3)
-	{
-		snprintf(sfm_current_path, NAME_MAX - 1, "%s", text);
+		break;
+	default:
+		break;
 	}
 
-	sfm_set_current_path(sfm_current_path);
-	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
+	if (option != 2) 
+		sfm_set_current_path(current_path);
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_get_current_path());
 }
 
 void do_select(GtkWidget *wid, gint x, gint y)
@@ -118,15 +111,15 @@ void do_select(GtkWidget *wid, gint x, gint y)
 	gchar filen[NAME_MAX], filep[NAME_MAX];
 	int i;
 
-	memset(filen, '\0', sizeof(filen));
-	memset(filep, '\0', sizeof(filep));
+	BUFFER_ZERO(filen);
+	BUFFER_ZERO(filep);
 
 	gtk_clist_get_text(GTK_CLIST(wid), x, y, &text);
-	fprintf(stderr, "line: %d. cell: %s/%s . %s\n", x, sfm_current_path, text, g_locale_to_utf8(text, -1, NULL, NULL, NULL));
+	fprintf(stderr, "line: %d. cell: %s/%s . %s\n", x, sfm_get_current_path(), text, g_locale_to_utf8(text, -1, NULL, NULL, NULL));
 
 	if (!strncmp(text, "..", 2))
 	{
-		strcpy(filep, sfm_current_path);
+		strcpy(filep, sfm_get_current_path());
 
 		for (i = strlen(filep); filep[i] != '/'; i--)
 			filep[i] = '\0';
@@ -134,16 +127,15 @@ void do_select(GtkWidget *wid, gint x, gint y)
 		if (i)
 			filep[i] = '\0';
 
-		snprintf(filen, NAME_MAX - 1, "%s", filep);
-		snprintf(sfm_current_path, NAME_MAX - 1, "%s", filen);
+		snprintf(filen, strlen(filep), "%s", filep);
 
-		fprintf(stderr, "DEBUG: %s . %s\n", sfm_current_path, filen);
+		fprintf(stderr, "DEBUG: %s . %s\n", sfm_get_current_path(), filen);
 	}
 	else
 	{
-		snprintf(filen, NAME_MAX, "%s/%s", sfm_current_path, text);
-		snprintf(sfm_current_path, NAME_MAX - 1, "%s", filen);
-		fprintf(stderr, "DEBUG: %s . %s\n", sfm_current_path, filen);
+		snprintf(filen, NAME_MAX, "%s/%s", sfm_get_current_path(), text);
+		sfm_set_current_path(filen);
+		fprintf(stderr, "DEBUG: %s . %s\n", sfm_get_current_path(), filen);
 	}
 
 	gtk_clist_clear(GTK_CLIST(wid));
@@ -212,9 +204,12 @@ void sfm_handle_rightview(GtkWidget *rightview)
 void sfm_gui_list_directory(int hidden)
 {
 	GtkListStore *store = NULL;
-	GdkPixbuf *pixbuf = NULL;
 	GtkTreeIter iter;
-	mfile *n = NULL;
+	GError *gerror = NULL;
+	mfile *file_list = NULL;
+
+	GdkPixbuf *pixbuf_directory = gdk_pixbuf_new_from_file("picz/sfmfolder.png", &gerror);
+	GdkPixbuf *pixbuf_file = gdk_pixbuf_new_from_file("picz/sfmfolder.png", &gerror);
 
 	if (sfm.scroll)
 		gtk_widget_destroy(sfm.scroll);
@@ -237,30 +232,30 @@ void sfm_gui_list_directory(int hidden)
 
 	gtk_box_pack_start(GTK_BOX(sfm.fileview), sfm.scroll, TRUE, TRUE, 2);
 
-	store = gtk_list_store_new(ITEM_TOTAL, G_TYPE_STRING, G_TYPE_STRING,
+	store = gtk_list_store_new(SFM_ITEM_TOTAL, G_TYPE_STRING, G_TYPE_STRING,
 							   GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
 	gtk_list_store_clear(store);
 
-	sfm_mfile_free();
-	sfm_scan_directory(hidden);
-
-	n = list;
-	GError *gerror;
-	while (n != NULL)
+	fprintf(stdout, "HEYHEY - %s -- sfm_current_path: %s\n", __FILE__, sfm_get_current_path());
+	fprintf(stdout, "HEYHEY - %s -- sizeofList: %d\n", __FILE__, sizeof(list));
+	file_list = list;
+	while (file_list != NULL)
 	{
-		if (S_ISDIR(n->fstat.st_mode))
-			pixbuf = gdk_pixbuf_new_from_file("picz/sfmfolder.png", &gerror);
+		GdkPixbuf *pixbuf = NULL;
+		
+		if (S_ISDIR(file_list->fstat.st_mode))
+			pixbuf = pixbuf_directory;
 		else
-			pixbuf = gdk_pixbuf_new_from_file("picz/sfmfile.png", &gerror);
+			pixbuf = pixbuf_file; 
 
 		gtk_list_store_append(store, &iter);
-		gtk_list_store_set(store, &iter, ITEM_PATH, sfm_current_path,
-						   ITEM_NAME, n->fname, ITEM_IMAGE, pixbuf,
-						   ITEM_TYPE, n->fname + (strlen(n->fname) - 3),
-						   ITEM_SIZE, n->fstat.st_size, -1);
+		gtk_list_store_set(store, &iter, SFM_ITEM_PATH, sfm_get_current_path(),
+						   SFM_ITEM_NAME, file_list->fname, SFM_ITEM_IMAGE, pixbuf,
+						   SFM_ITEM_TYPE, file_list->fname + (strlen(file_list->fname) - 3),
+						   SFM_ITEM_SIZE, file_list->fstat.st_size, -1);
 
-		fprintf(stdout, ".:- %s\n", n->fname);
-		n = (mfile *)n->next;
+		fprintf(stdout, ":. %s:%d -- listfile: %s\n", __FILE__, __LINE__, file_list->fname);
+		file_list = (mfile *)file_list->next;
 		g_object_unref(pixbuf);
 		pixbuf = NULL;
 	}
@@ -269,8 +264,8 @@ void sfm_gui_list_directory(int hidden)
 	gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(sfm.icon_view),
 									 GTK_SELECTION_MULTIPLE);
 
-	gtk_icon_view_set_text_column(GTK_ICON_VIEW(sfm.icon_view), ITEM_NAME);
-	gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(sfm.icon_view), ITEM_IMAGE);
+	gtk_icon_view_set_text_column(GTK_ICON_VIEW(sfm.icon_view), SFM_ITEM_NAME);
+	gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(sfm.icon_view), SFM_ITEM_IMAGE);
 	gtk_icon_view_set_item_width(GTK_ICON_VIEW(sfm.icon_view), 96);
 
 	gtk_container_add(GTK_CONTAINER(sfm.scroll), sfm.icon_view);
@@ -295,7 +290,7 @@ void sfm_callback_execute(GtkIconView *iconview,
 	store = GTK_LIST_STORE(user_data);
 
 	gtk_tree_model_get_iter(GTK_TREE_MODEL(store), &iter, treepath);
-	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, ITEM_NAME, &item, -1);
+	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, SFM_ITEM_NAME, &item, -1);
 
 	fprintf(stdout, "-=> %s\n", item);
 }
@@ -304,7 +299,7 @@ void sfm_callback_change_dir(GtkWidget *widget, GtkWidget *entry)
 {
 	const gchar *directory = gtk_entry_get_text(GTK_ENTRY(entry));
 	sfm_set_current_path(directory);
-	sfm_gui_list_directory(FILES_HIDDEN);
+	sfm_gui_list_directory(SFM_FILES_HIDDEN);
 	sfm_debug(directory);
 }
 
@@ -407,8 +402,8 @@ void sfm_gui(void)
 	gtk_box_pack_start(GTK_BOX(sfm.level4), sfm.statusbar, FALSE, TRUE, 1);
 	gtk_box_pack_start(GTK_BOX(sfm.level2), sfm.level4, FALSE, TRUE, 1);
 
-	sfm_gui_list_directory(FILES_HIDDEN);
-	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
+	sfm_gui_list_directory(SFM_FILES_HIDDEN);
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_get_current_path());
 
 	//	g_signal_connect(GTK_OBJECT(sfm.clist), "select", GTK_SIGNAL_FUNC(sfm_callback_select_menu), NULL);
 	g_signal_connect(G_OBJECT(sfm.firstwin), "delete_event", G_CALLBACK(sfm_callback_exit), NULL);

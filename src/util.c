@@ -19,7 +19,10 @@
  * MA 02110-1301, USA.
  */
 
-#include "main.h"
+#include "util.h"
+
+char sfm_current_path[FILENAME_MAX];
+mfile *list;
 
 /*
 char *sfm_bash_exec(char *cmd)
@@ -118,7 +121,7 @@ void sfm_scan_directory(int hidden)
 	free(files);
 }
 
-void sfm_set_current_path(const char *name)
+void sfm_set_current_path(char *name)
 {
 	struct stat fstat;
 
@@ -128,21 +131,26 @@ void sfm_set_current_path(const char *name)
 	{
 		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
 		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Error! Directory not found.");
-
-		gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 	}
 	else
 	{
 		BUFFER_ZERO(sfm_current_path);
 		snprintf(sfm_current_path, FILENAME_MAX - 1, "%s", name);
-		sfm_scan_directory(0);
-		sfm_gui_list_directory(0);
+		sfm_scan_directory(SFM_FILES_ALL);
+		sfm_gui_list_directory(SFM_FILES_ALL);
 
 		gtk_statusbar_pop(GTK_STATUSBAR(sfm.statusbar), 1);
 		gtk_statusbar_push(GTK_STATUSBAR(sfm.statusbar), 1, "Well done!");
 	}
 
+	fprintf(stdout, "%s:%d -- %s\n", __FILE__, __LINE__, sfm_current_path);
+	gtk_entry_set_text(GTK_ENTRY(sfm.path_entry), sfm_current_path);
 	// sfm_debug(name);
+}
+
+char *sfm_get_current_path(void)
+{
+	return (char *)sfm_current_path;
 }
 
 void sfm_debug(const char *debug_message)

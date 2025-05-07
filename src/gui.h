@@ -1,7 +1,8 @@
-#include "main.h"
-
 #ifndef _SFM_GUI_H_
 #define _SFM_GUI_H_
+
+#include "main.h"
+#include "views.h"
 
 typedef struct
 {
@@ -49,12 +50,12 @@ void sfm_select_menu(GtkWidget *, gint, gint);
 
 enum
 {
-	ITEM_PATH,
-	ITEM_NAME,
-	ITEM_IMAGE,
-	ITEM_TYPE,
-	ITEM_SIZE,
-	ITEM_TOTAL
+	SFM_ITEM_PATH,
+	SFM_ITEM_NAME,
+	SFM_ITEM_IMAGE,
+	SFM_ITEM_TYPE,
+	SFM_ITEM_SIZE,
+	SFM_ITEM_TOTAL
 };
 
 static GtkItemFactoryEntry guimenu_items[] = {
