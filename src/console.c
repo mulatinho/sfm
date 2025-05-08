@@ -1,168 +1,253 @@
-#include "main.h"
+#include "console.h"
 
 void sfm_left_tree(void);
 void sfm_right_tree(void);
 void sfm_down_menu(void);
 
+sfm_ncurses_win *iface = NULL;
+
+sfm_ncurses_win *sfm_get_interface(void)
+{
+	return (sfm_ncurses_win *)iface;
+}
+
+WINDOW *sfm_create_window(int lines, int cols, int y, int x)
+{
+	// WINDOW *curr_window = newwin(lines, cols, y, x);
+	WINDOW *curr_window = newwin(lines, cols, y, x);
+
+	keypad(curr_window, TRUE);
+	start_color();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	noecho();
+
+	//wattron(curr_window, COLOR_PAIR(1) | A_BOLD);
+	//wattroff(curr_window, COLOR_PAIR(1) | A_BOLD);
+	wrefresh(curr_window);
+	refresh();
+
+	return curr_window;
+}
+
+void sfm_refresh_window(WINDOW *curr_window)
+{
+	wrefresh(curr_window);
+	refresh();
+}
+
+int sfm_update_window(WINDOW *curr_window)
+{
+	sfm_ncurses_win *curr_interface = sfm_get_interface();
+
+	if (curr_interface->sfm_win_menu == curr_window)
+		return 1;
+
+	wclear(curr_window);
+	sfm_refresh_window(curr_window);
+}
+
+int sfm_update_window_status(WINDOW *curr_window, char *message)
+{
+	time_t c_time;
+	struct tm *time_now;
+	sfm_ncurses_win *curr_interface = sfm_get_interface();
+
+	c_time = time(NULL);
+	time_now = localtime(&c_time);
+
+	if (curr_interface->sfm_win_status != curr_window)
+		return 1;
+	
+	wclear(curr_interface->sfm_win_status);
+	mvwprintw(curr_window, 1, 1, "%.2dm%.2ds %s", 
+		time_now->tm_min, time_now->tm_sec, message);
+
+	sfm_refresh_window(curr_window);
+}
+
+void sfm_trigger_menu_action(ITEM *curr_item)
+{
+	int menu_choices_size = ARRAY_SIZE(menu_choices);
+	const char *choosed_item_name = item_name(curr_item);
+
+	if (!choosed_item_name)
+		return;
+
+	for (int choice = 0; choice < menu_choices_size; choice++) {
+		if (!strncmp(menu_choices[choice], choosed_item_name, strlen(menu_choices[choice]))) {
+			return;
+		}
+	}
+}
+
+void sfm_make_menu(void)
+{
+	int n_menu_choices;
+
+	keypad(iface->sfm_win_menu, TRUE);
+	start_color();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+
+	wattron(iface->sfm_win_menu, COLOR_PAIR(1) | A_BOLD);
+	mvwprintw(iface->sfm_win_menu, iface->lines - 2, iface->cols - 2, "");
+
+	n_menu_choices = ARRAY_SIZE(menu_choices);
+	iface->sfm_menu_items = (ITEM **)calloc(n_menu_choices + 1, sizeof(ITEM *));
+
+	for (int i = 0; i < n_menu_choices; ++i)
+		iface->sfm_menu_items[i] = new_item(menu_choices[i], NULL);
+	iface->sfm_menu_items[n_menu_choices] = (ITEM *)NULL;
+
+	iface->sfm_menu = new_menu((ITEM **)iface->sfm_menu_items);
+
+	menu_opts_off(iface->sfm_menu, O_SHOWDESC);
+	set_menu_format(iface->sfm_menu, 1, n_menu_choices);
+	set_menu_mark(iface->sfm_menu, "@");
+	post_menu(iface->sfm_menu);
+
+	sfm_refresh_window(iface->sfm_win_menu);
+	free(iface->sfm_menu);
+	for (int i = 0; i < n_menu_choices; i++)
+		free(iface->sfm_menu_items[i]);
+}
+
+void sfm_make_window_file_list(void)
+{
+	int n_menu_choices;
+
+	start_color();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+
+	wattron(iface->sfm_win_root, COLOR_PAIR(1) | A_BOLD);
+	mvwprintw(iface->sfm_win_root, iface->lines - 2, iface->cols - 2, "");
+
+	n_menu_choices = ARRAY_SIZE(menu_choices);
+	iface->sfm_menu_items = (ITEM **)calloc(n_menu_choices + 1, sizeof(ITEM *));
+
+	for (int i = 0; i < n_menu_choices; ++i)
+		iface->sfm_menu_items[i] = new_item(menu_choices[i], NULL);
+	iface->sfm_menu_items[n_menu_choices] = (ITEM *)NULL;
+
+	iface->sfm_menu = new_menu((ITEM **)iface->sfm_menu_items);
+
+	menu_opts_off(iface->sfm_menu, O_SHOWDESC);
+	set_menu_format(iface->sfm_menu, 1, n_menu_choices);
+	set_menu_mark(iface->sfm_menu, "@");
+	post_menu(iface->sfm_menu);
+
+	sfm_refresh_window(iface->sfm_win_root);
+	free(iface->sfm_menu);
+	for (int i = 0; i < n_menu_choices; i++)
+		free(iface->sfm_menu_items[i]);
+}
+
 void sfm_make_windows(void)
 {
-	sfm_ncurses_win *iface = malloc(sizeof(sfm_ncurses_win));
+	int nloop, c;
+	iface = malloc(sizeof(sfm_ncurses_win));
 
 	initscr();
-	start_color();
-	noecho();
 	cbreak();
 
 	getmaxyx(stdscr, iface->lines, iface->cols);
 
-	iface->sfmncmenu = newwin(3, iface->cols - 1, iface->lines - 5, 0);
-	keypad(iface->sfmncmenu, TRUE);
-	wmove(iface->sfmncmenu, 1, 1);
-	box(iface->sfmncmenu, 0, 0);
+	iface->sfm_win_menu = sfm_create_window(2, iface->cols - 1, 0, 0);
+	sfm_make_menu();
+	sfm_refresh_window(iface->sfm_win_menu);
 
-	sleep(4);
-	free(iface);
+	iface->sfm_win_root = sfm_create_window(iface->lines - 4, iface->cols - 1, 2, 0);
+	sfm_refresh_window(iface->sfm_win_root);
 
-	refresh();
+	iface->sfm_win_status = sfm_create_window(2, iface->cols - 1, iface->lines - 2, 0);
+	sfm_refresh_window(iface->sfm_win_status);
+
+
+	nloop = 0; 
+	WINDOW *window_list[] = {
+		iface->sfm_win_menu,
+		iface->sfm_win_root,
+		iface->sfm_win_status,
+	};
+	int window_list_size = ARRAY_SIZE(window_list);
+
+	keypad(stdscr, TRUE);
+	while (true)
+	{
+		char message[NAME_MAX];
+		time_t c_time;
+		struct tm *time_now;
+
+		c_time = time(NULL);
+		time_now = localtime(&c_time);
+
+		c = getch();
+		switch (c) {
+		// case KEY_UP:
+		// 	nloop++;
+		// 	if (nloop > window_list_size)
+		// 		nloop = window_list_size; 
+		// 	break;
+		// case KEY_DOWN:
+		// 	nloop--;
+		// 	if (nloop < 0)
+		// 		nloop = window_list_size;
+		// 	break;
+		case KEY_LEFT:
+			menu_driver(iface->sfm_menu, REQ_LEFT_ITEM);
+			break;
+
+		case KEY_RIGHT:
+			menu_driver(iface->sfm_menu, REQ_RIGHT_ITEM);
+			break;
+
+		case KEY_DOWN: // TAB
+			nloop++;
+			if (nloop > window_list_size) 
+				nloop = 0;
+			sprintf(message, "loop->%d time->%.2d%.2d KEYDOWN", nloop, time_now->tm_min, time_now->tm_sec);
+			sfm_update_window_status(window_list[nloop], message);
+
+			break;
+		case KEY_UP: // TAB
+			nloop--; 
+			if (nloop < 0) 
+				nloop = window_list_size;
+			sprintf(message, "loop->%d time->%.2d%.2d KEYUP", nloop, time_now->tm_min, time_now->tm_sec);
+			sfm_update_window_status(window_list[nloop], message);
+
+			break;
+		case SFM_KEY_ENTER:
+			if (iface->sfm_win_menu == window_list[nloop]) {
+				ITEM *curr_item = current_item(iface->sfm_menu);
+				sfm_trigger_menu_action(curr_item);
+			}
+
+			sfm_update_window_status(window_list[nloop], "HELLO");
+			break;
+				
+/*		default:
+			nloop++;
+			if (nloop > window_list_size) 
+				nloop = 0;
+			break; */
+		}
+	
+		wrefresh(window_list[nloop]);
+		keypad(window_list[nloop], TRUE);
+		refresh();
+
+		usleep(250);
+	}
+
 	endwin();
+}
+
+void sfm_free(void)
+{
+	free(iface);
 }
 
 void sfm_ncurses(void)
 {
 	sfm_make_windows();
-	/*
-int x;
-sfm_ncurses_win *iface = malloc(sizeof(sfm_ncurses_win));
-char root_items[FILENAME_MAX];
-int user_input;
-WINDOW *current_window;
-ITEM **ncmenu_items = NULL;
-MENU *sfm_menu;
-
-initscr();
-start_color();
-noecho();
-cbreak();
-
-getmaxyx(stdscr, iface->lines, iface->cols);
-	fprintf(stdout, "lines: %d, columns: %d\n", iface->lines, iface->cols);
-refresh();
-
-iface->sfmncmenu = newwin(3, iface->cols-1, iface->lines-5, 0);
-keypad(iface->sfmncmenu, TRUE);
-wmove(iface->sfmncmenu, 1, 1);
-box(iface->sfmncmenu, 0, 0);
-
-ncmenu_items = malloc((menu_choices_n+1) * sizeof(ITEM *));
-for (x = 0; x < menu_choices_n; x++)
-	ncmenu_items[x] = new_item(menu_choices[x], menu_choices[x]);
-//ncmenu_items[menu_choices_n] = (ITEM *)NULL;
-
-sfm_menu = new_menu((ITEM **)ncmenu_items);
-menu_opts_off(sfm_menu, O_SHOWDESC);
-set_menu_format(sfm_menu, 1, menu_choices_n);
-set_menu_mark(sfm_menu, " ");
-set_menu_win(sfm_menu, iface->sfmncmenu);
-set_menu_sub(sfm_menu, derwin(iface->sfmncmenu, 1, iface->cols-2, 1, 1));
-post_menu(sfm_menu);
-
-wrefresh(iface->sfmncmenu);
-
-iface->sfmnroot = newwin(iface->lines-6, iface->cols-4, 0, 0);
-
-snprintf(root_items, sizeof(root_items)-1, "%-40s . %-6s . %-4s . %-3s . %-10s",
-	"FILENAME", "SIZE", "TYPE", "UID", "PERMISSIONS");
-wattron(iface->sfmnroot, A_REVERSE|A_BOLD);
-wprintw(iface->sfmnroot, root_items);
-wattroff(iface->sfmnroot, A_REVERSE|A_BOLD);
-
-for (x = 1; x < (iface->lines - 6); x++) {
-	snprintf(root_items, sizeof(root_items)-1, "Item line %2d                             . 55Kb   . .PDF . 100 . -rw-r--r--", x);
-	mvwprintw(iface->sfmnroot, x, 0, root_items);
-}
-
-wrefresh(iface->sfmnroot);
-
-iface->sfmnstatus = newwin(1, iface->cols-1, iface->lines-2, 1);
-wprintw(iface->sfmnstatus, ":. Hello! Welcome to .: %s :. lines:%d, cols:%d",
-	SFM_VSN, iface->lines, iface->cols);
-wrefresh(iface->sfmnstatus);
-
-current_window = iface->sfmncmenu;
-while (1) {
-	user_input = wgetch(current_window);
-
-	switch (user_input) {
-	case KEY_LEFT:
-		menu_driver(sfm_menu, REQ_LEFT_ITEM);
-		break;
-	case KEY_RIGHT:
-		menu_driver(sfm_menu, REQ_RIGHT_ITEM);
-		break;
-	case KEY_UP:
-		menu_driver(sfm_, REQ_UP_ITEM);
-					break;
-	case KEY_DOWN:
-		menu_driver(sfm_menu, REQ_DOWN_ITEM);
-		break;
-	case 9:
-		if (current_window == iface->sfmncmenu)
-			current_window = iface->sfmnroot;
-		else
-			current_window = iface->sfmncmenu;
-
-		keypad(current_window, TRUE);
-		break;
-	case 10:
-		{
-			//ITEM *cur;
-
-			//cur = current_item(sfm_menu);
-
-		}
-		break;
-	case 'Q':
-	case 'q':
-		wclear(iface->sfmnstatus);
-		wprintw(iface->sfmnstatus, ":. Are you sure you want to quit!? [Y/N] ");
-		wrefresh(iface->sfmnstatus);
-
-		user_input = wgetch(iface->sfmnstatus);
-		switch (user_input) {
-		case 'y': case 'Y':
-		case 's': case 'S':
-			wclear(iface->sfmnstatus);
-			wprintw(iface->sfmnstatus, ":. Thanks for using SFM! :) Quitting...");
-			wrefresh(iface->sfmnstatus);
-			sleep(1);
-
-			goto sfm_ncurses_exit;
-		default:
-			break;
-		}
-	}
-
-	wclear(iface->sfmnstatus);
-	wprintw(iface->sfmnstatus, ":. status: %d", user_input);
-	wrefresh(iface->sfmnstatus);
-}
-
-sfm_ncurses_exit:
-delwin(iface->sfmnroot);
-delwin(iface->sfmnstatus);
-delwin(iface->sfmncmenu);
-
-unpost_menu(sfm_menu);
-free_menu(sfm_menu);
-
-for (x = 0; x < menu_choices_n; x++)
-	free_item(ncmenu_items[x]);
-
-free(ncmenu_items);
-
-free(iface);
-
-refresh();
-endwin();
-	*/
 }

@@ -286,9 +286,9 @@ void sfm_callback_execute(GtkIconView *iconview,
 	if (S_ISDIR(obj.st_mode)) {
 		char directory[FILENAME_MAX];
 		BUFFER_ZERO(directory);
-		if (!strncmp(item, "..", strlen(item)))
+		if (!strncmp(item, "..", 2)) 
 			snprintf(directory, FILENAME_MAX - 1, "%s", dirname(sfm_get_current_path()));
-		else if (!strncmp(item, ".", strlen(item))) {
+		else if (!strncmp(item, ".", 1)) {
 			item[strlen(item)-1] = '\0';
 			snprintf(directory, FILENAME_MAX - 1, "%s/%s", sfm_get_current_path(), item);
 		} else
