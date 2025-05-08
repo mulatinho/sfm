@@ -28,7 +28,11 @@ jobs:
         run: |-
           echo "$TOKEN" | gh auth login --with-token
 
-          docker pull mulatinho/sfm:latest
+          docker build -t mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER .
+          docker tag mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER mulatinho/sfm:latest
+          docker push mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER
+          docker push mulatinho/sfm:latest
+
           docker run -d --name sfm mulatinho/sfm sleep 5
           docker cp sfm:/usr/src/sfm/src/sfm ./sfm
 
