@@ -59,10 +59,8 @@
 #define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
 #define SFM_VSN PROGNAME " v" PROGVERSION
 
-enum {
-    SFM_MODE_NCURSES,
-    SFM_MODE_GUI
-};
+#define SFM_MODE_NCURSES 0
+#define SFM_MODE_GUI 1
 
 struct context {
     int mode;

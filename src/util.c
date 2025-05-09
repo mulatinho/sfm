@@ -104,9 +104,14 @@ void sfm_scan_directory(int hidden)
 	int count, n;
 	char filename[FILENAME_MAX];
 
+	if (!ctx)
+		return;
+
+	SFM_DEBUG("currdir: %s", sfm_get_current_path());
 	sfm_mfile_free();
 
-	count = scandir(ctx->sfm_current_path, &files, 0, alphasort);
+	count = scandir(sfm_get_current_path(), &files, 0, alphasort);
+	SFM_DEBUG("%s", "JACK");
 	for (n = 0; n < count; n++)
 	{
 		BUFFER_ZERO(filename);
@@ -126,43 +131,35 @@ void sfm_set_current_path(char *name)
 {
 	struct stat fstat;
 
-	stat(name, &fstat);
+	if (!ctx)
+		return;
 
+	//BUFFER_ZERO(ctx->sfm_current_path);
+	snprintf(ctx->sfm_current_path, FILENAME_MAX - 1, "%s\0", name);
+
+	stat(ctx->sfm_current_path, &fstat);
 	if (!S_ISDIR(fstat.st_mode))
-	{
-		gtk_statusbar_pop(GTK_STATUSBAR(sfm_gui.statusbar), 1);
-		gtk_statusbar_push(GTK_STATUSBAR(sfm_gui.statusbar), 1, "Error! Directory not found.");
-	}
-	else
-	{
-		//BUFFER_ZERO(ctx->sfm_current_path);
-		snprintf(ctx->sfm_current_path, FILENAME_MAX - 1, "%s", name);
-		if (chdir(ctx->sfm_current_path)) {
-			gtk_statusbar_pop(GTK_STATUSBAR(sfm_gui.statusbar), 1);
-			gtk_statusbar_push(GTK_STATUSBAR(sfm_gui.statusbar), 1, "Error! Directory not found.");
-		}
+		return;
+	
+	SFM_DEBUG("mode is %d and path is %s\n", ctx->mode, sfm_get_current_path());
+	if (ctx->mode == SFM_MODE_GUI) {
+		chdir(sfm_get_current_path());
 		sfm_scan_directory(SFM_FILES_ALL);
-		sfm_gui_list_directory(SFM_FILES_ALL);
-		gtk_entry_set_text(GTK_ENTRY(sfm_gui.path_entry), ctx->sfm_current_path);
 
-		gtk_statusbar_pop(GTK_STATUSBAR(sfm_gui.statusbar), 1);
-		gtk_statusbar_push(GTK_STATUSBAR(sfm_gui.statusbar), 1, "Well done!");
+		SFM_DEBUG("%s\n", "end of sfm_set_current_path:SFM_GUI")
 	}
 
-	fprintf(stdout, "%s:%d -- %s\n", __FILE__, __LINE__, ctx->sfm_current_path);
-	// sfm_debug(name);
+	if (ctx->mode == SFM_MODE_NCURSES) {
+		return;
+	} 
+
+	SFM_DEBUG("%s\n", "end of sfm_set_current_path")
 }
 
 char *sfm_get_current_path(void)
 {
-	return (char *)ctx->sfm_current_path;
-}
+	if (!ctx)
+		return NULL;
 
-void sfm_debug(const char *debug_message)
-{
-#ifdef DEBUG
-	fprintf(stdout, ":.\n");
-	fprintf(stdout, ":. debug: %s:%d - message: %s\n", __FILE__, __LINE__, debug_message);
-	fprintf(stdout, ":. sfm_current_path: %s\n\n", ctx->sfm_current_path);
-#endif
+	return (char *)ctx->sfm_current_path;
 }

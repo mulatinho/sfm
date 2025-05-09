@@ -8,6 +8,15 @@
 
 #define BUFFER_ZERO(buffer) memset(buffer, '\0', sizeof(buffer))
 
+#ifdef DEBUG
+	#define SFM_DEBUG(format, debug_message...) \
+	fprintf(stderr, ":.\n:. debug: %s:%d\n", __FILE__, __LINE__); \
+	fprintf(stderr, ":. sfm_current_path: %s\n:. message: ", ctx->sfm_current_path); \
+	fprintf(stderr, format, ## debug_message);
+#else
+	#define SFM_DEBUG(format, debug_message..)
+#endif
+
 char *sfm_bash_exec(char *);
 extern int alphasort();
 int sfm_has_shortcuts(void);

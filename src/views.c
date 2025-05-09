@@ -1,4 +1,5 @@
-#include "main.h"
+#include "gui.h"
+#include "views.h"
 
 void sfm_view_list(GtkWidget *wid, gpointer p)
 {

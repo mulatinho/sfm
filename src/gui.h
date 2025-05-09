@@ -1,7 +1,6 @@
 #ifndef _SFM_GUI_H_
 #define _SFM_GUI_H_
 
-#include "main.h"
 #include "views.h"
 
 typedef struct

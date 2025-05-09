@@ -1,4 +1,4 @@
-#include "main.h"
+#include "options.h"
 
 #define SFM_CONFIG ".config/sfm/config"
 

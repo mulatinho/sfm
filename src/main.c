@@ -29,32 +29,18 @@ int main(int argc, char **argv)
 	char *env_pwd = getenv("PWD");
 	ctx = malloc(sizeof(struct context*));
 
-#ifdef DEBUG
-	ret = sfm_config_init();
-	fprintf(stdout, "sfm_config_init: %d\n", ret);
-
-	ret = sfm_config_load();
-	fprintf(stdout, "sfm_config_load: %d\n", ret);
-
-	ret = sfm_config_set("ui", "ncurses");
-	fprintf(stdout, "sfm_config_set : %d\n", ret);
-#endif
-
+	ctx->mode = SFM_MODE_GUI;
 	sfm_set_current_path(env_pwd);
 
-	if (argc <= 1)
-	{
-		ctx->mode = SFM_MODE_GUI;
-		sfm_gui_start(ctx);
-		return 0;
-	}
-	while ((opt = getopt(argc, argv, "gnv")) != -1)
+	while ((opt = getopt(argc, argv, "ghnuv")) != -1)
 	{
 		switch (opt)
 		{
 		case 'u':
 		case 'h':
-			// user and hostname, future.
+			fprintf(stdout,
+					"usage: %s [-n ncurses|-g graphical|-v version]\n",
+					argv[0]);
 			break;
 		case 'n':
 			ctx->mode = SFM_MODE_NCURSES;
@@ -63,11 +49,10 @@ int main(int argc, char **argv)
 		case 'v':
 			fprintf(stdout, SFM_VERSION);
 			break;
+		case 'g':
 		default:
-			fprintf(stdout,
-					"usage: %s [-n ncurses|-g graphical|-v version]\n",
-					argv[0]);
-			return 1;
+			sfm_gui_start(ctx);
+			break;
 		}
 	}
 

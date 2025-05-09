@@ -53,6 +53,7 @@ void sfm_link_event(GtkWidget *label, const gchar *uri, gpointer data)
 	{
 		char *env_home = getenv("HOME");
 		sfm_set_current_path(env_home);
+		sfm_gui_list_directory(SFM_FILES_HIDDEN);
 	}
 	else if (!strncmp(uri, "Samba", strlen(uri)))
 	{
@@ -104,7 +105,8 @@ void sfm_select_menu(GtkWidget *wid, gint option, gint y)
 
 	if (option != 2) 
 		sfm_set_current_path(current_path);
-	gtk_entry_set_text(GTK_ENTRY(sfm_gui.path_entry), sfm_get_current_path());
+		gtk_entry_set_text(GTK_ENTRY(sfm_gui.path_entry), sfm_get_current_path());
+		sfm_gui_list_directory(SFM_FILES_ALL);
 }
 
 /* void do_select(GtkWidget *wid, gint x, gint y)
@@ -199,6 +201,14 @@ void sfm_gui_list_directory(int hidden)
 	GtkTreeIter iter;
 	GError *gerror = NULL;
 	mfile *file_list = NULL;
+	char statusbar[NAME_MAX];
+	
+	BUFFER_ZERO(statusbar);
+	snprintf(statusbar, NAME_MAX - 1, "Directory: %s is opened - Well done!", sfm_get_current_path());
+
+	gtk_entry_set_text(GTK_ENTRY(sfm_gui.path_entry), sfm_get_current_path());
+	gtk_statusbar_pop(GTK_STATUSBAR(sfm_gui.statusbar), 1);
+	gtk_statusbar_push(GTK_STATUSBAR(sfm_gui.statusbar), 1, statusbar);
 
 	GdkPixbuf *pixbuf_directory = gdk_pixbuf_new_from_file("picz/sfmfolder.png", &gerror);
 	GdkPixbuf *pixbuf_file = gdk_pixbuf_new_from_file("picz/sfmfile.png", &gerror);
@@ -282,22 +292,18 @@ void sfm_callback_execute(GtkIconView *iconview,
 	gtk_tree_model_get_iter(GTK_TREE_MODEL(store), &iter, treepath);
 	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, SFM_ITEM_NAME, &item, -1);
 
-	fprintf(stdout, "-=> %s\n", item);
-	
 	stat(item, &obj);
 	if (S_ISDIR(obj.st_mode)) {
 		char directory[FILENAME_MAX];
 		BUFFER_ZERO(directory);
 		if (!strncmp(item, "..", 2)) 
 			snprintf(directory, FILENAME_MAX - 1, "%s", dirname(sfm_get_current_path()));
-		else if (!strncmp(item, ".", 1)) {
-			item[strlen(item)-1] = '\0';
-			snprintf(directory, FILENAME_MAX - 1, "%s/%s", sfm_get_current_path(), item);
-		} else
+		else
 			snprintf(directory, FILENAME_MAX - 1, "%s/%s", sfm_get_current_path(), item);
 		
 		fprintf(stdout, "-=> %s:%d -> directory: %s\n", __FILE__, __LINE__, directory);
 		sfm_set_current_path(directory);
+		sfm_gui_list_directory(SFM_FILES_ALL);
 	} else 
 		sfm_exec_file(item);
 }
@@ -307,7 +313,6 @@ void sfm_callback_change_dir(GtkWidget *widget, GtkWidget *entry)
 	const gchar *directory = gtk_entry_get_text(GTK_ENTRY(entry));
 	sfm_set_current_path(directory);
 	sfm_gui_list_directory(SFM_FILES_HIDDEN);
-	sfm_debug(directory);
 }
 
 gboolean sfm_callback_exit(GtkWidget *widget, GdkEvent *event)
@@ -410,7 +415,6 @@ void sfm_gui_start(struct context *ctx)
 	gtk_box_pack_start(GTK_BOX(sfm_gui.level2), sfm_gui.level4, FALSE, TRUE, 1);
 
 	sfm_gui_list_directory(SFM_FILES_HIDDEN);
-	gtk_entry_set_text(GTK_ENTRY(sfm_gui.path_entry), sfm_get_current_path());
 
 	//	g_signal_connect(GTK_OBJECT(sfm_gui.clist), "select", GTK_SIGNAL_FUNC(sfm_callback_select_menu), NULL);
 	g_signal_connect(G_OBJECT(sfm_gui.firstwin), "delete_event", G_CALLBACK(sfm_callback_exit), NULL);
