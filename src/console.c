@@ -21,8 +21,8 @@ WINDOW *sfm_create_window(int lines, int cols, int y, int x)
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	noecho();
 
-	//wattron(curr_window, COLOR_PAIR(1) | A_BOLD);
-	//wattroff(curr_window, COLOR_PAIR(1) | A_BOLD);
+	// wattron(curr_window, COLOR_PAIR(1) | A_BOLD);
+	// wattroff(curr_window, COLOR_PAIR(1) | A_BOLD);
 	wrefresh(curr_window);
 	refresh();
 
@@ -57,10 +57,10 @@ int sfm_update_window_status(WINDOW *curr_window, char *message)
 
 	if (curr_interface->sfm_win_status != curr_window)
 		return 1;
-	
+
 	wclear(curr_interface->sfm_win_status);
-	mvwprintw(curr_window, 1, 1, "%.2dm%.2ds %s", 
-		time_now->tm_min, time_now->tm_sec, message);
+	mvwprintw(curr_window, 1, 1, "%.2dm%.2ds %s",
+			  time_now->tm_min, time_now->tm_sec, message);
 
 	sfm_refresh_window(curr_window);
 }
@@ -73,8 +73,10 @@ void sfm_trigger_menu_action(ITEM *curr_item)
 	if (!choosed_item_name)
 		return;
 
-	for (int choice = 0; choice < menu_choices_size; choice++) {
-		if (!strncmp(menu_choices[choice], choosed_item_name, strlen(menu_choices[choice]))) {
+	for (int choice = 0; choice < menu_choices_size; choice++)
+	{
+		if (!strncmp(menu_choices[choice], choosed_item_name, strlen(menu_choices[choice])))
+		{
 			return;
 		}
 	}
@@ -113,15 +115,38 @@ void sfm_make_menu(void)
 
 void sfm_make_window_file_list(void)
 {
-	int n_menu_choices;
+	int n_menu_choices, line_number;
+	char line_message[NAME_MAX];
+	mfile *file_list = NULL;
 
 	start_color();
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 
-	wattron(iface->sfm_win_root, COLOR_PAIR(1) | A_BOLD);
-	mvwprintw(iface->sfm_win_root, iface->lines - 2, iface->cols - 2, "");
+	BUFFER_ZERO(line_message);
+	snprintf(line_message, NAME_MAX - 1, "%-6s %-100s %-6s %-12s\n", "<TYPE>", "<NAME>", "<SIZE>", "<OWNER>");
 
-	n_menu_choices = ARRAY_SIZE(menu_choices);
+	wattron(iface->sfm_win_root, COLOR_PAIR(1) | A_BOLD);	
+	mvwprintw(iface->sfm_win_root, 2, 2, line_message);
+	wattroff(iface->sfm_win_root, COLOR_PAIR(1) | A_BOLD);
+
+	line_number = 4;
+	file_list = list;
+	while (file_list != NULL)
+	{
+		//BUFFER_ZERO(line_message);
+
+		if (S_ISDIR(file_list->fstat.st_mode))
+			snprintf(line_message, NAME_MAX - 1, "%-6s %-100s %-6d %-12d\n", " DIR  ", file_list->fname, file_list->fstat.st_size, file_list->fstat.st_uid);
+		else
+			snprintf(line_message, NAME_MAX - 1, "%-6s %-100s %-6s %-12s\n", " FILE ", file_list->fname, file_list->fstat.st_size, file_list->fstat.st_uid);
+
+		//mvwprintw(iface->sfm_win_root, line_number, 2, line_message);
+
+		file_list = (mfile *)file_list->next;
+		line_number++;
+	}
+
+/*	n_menu_choices = ARRAY_SIZE(menu_choices);
 	iface->sfm_menu_items = (ITEM **)calloc(n_menu_choices + 1, sizeof(ITEM *));
 
 	for (int i = 0; i < n_menu_choices; ++i)
@@ -133,12 +158,12 @@ void sfm_make_window_file_list(void)
 	menu_opts_off(iface->sfm_menu, O_SHOWDESC);
 	set_menu_format(iface->sfm_menu, 1, n_menu_choices);
 	set_menu_mark(iface->sfm_menu, "@");
-	post_menu(iface->sfm_menu);
+	post_menu(iface->sfm_menu);*/
 
 	sfm_refresh_window(iface->sfm_win_root);
-	free(iface->sfm_menu);
-	for (int i = 0; i < n_menu_choices; i++)
-		free(iface->sfm_menu_items[i]);
+	// free(iface->sfm_menu);
+	// for (int i = 0; i < n_menu_choices; i++)
+	// 	free(iface->sfm_menu_items[i]);
 }
 
 void sfm_make_windows(struct context *ctx)
@@ -156,13 +181,14 @@ void sfm_make_windows(struct context *ctx)
 	sfm_refresh_window(iface->sfm_win_menu);
 
 	iface->sfm_win_root = sfm_create_window(iface->lines - 4, iface->cols - 1, 2, 0);
+	sfm_set_current_path(ctx->sfm_current_path);
+	sfm_make_window_file_list();
 	sfm_refresh_window(iface->sfm_win_root);
 
 	iface->sfm_win_status = sfm_create_window(2, iface->cols - 1, iface->lines - 2, 0);
 	sfm_refresh_window(iface->sfm_win_status);
 
-
-	nloop = 0; 
+	nloop = 0;
 	WINDOW *window_list[] = {
 		iface->sfm_win_menu,
 		iface->sfm_win_root,
@@ -181,11 +207,12 @@ void sfm_make_windows(struct context *ctx)
 		time_now = localtime(&c_time);
 
 		c = getch();
-		switch (c) {
+		switch (c)
+		{
 		// case KEY_UP:
 		// 	nloop++;
 		// 	if (nloop > window_list_size)
-		// 		nloop = window_list_size; 
+		// 		nloop = window_list_size;
 		// 	break;
 		// case KEY_DOWN:
 		// 	nloop--;
@@ -202,36 +229,37 @@ void sfm_make_windows(struct context *ctx)
 
 		case KEY_DOWN: // TAB
 			nloop++;
-			if (nloop > window_list_size) 
+			if (nloop > window_list_size)
 				nloop = 0;
 			sprintf(message, "loop->%d time->%.2d%.2d KEYDOWN", nloop, time_now->tm_min, time_now->tm_sec);
 			sfm_update_window_status(window_list[nloop], message);
 
 			break;
 		case KEY_UP: // TAB
-			nloop--; 
-			if (nloop < 0) 
+			nloop--;
+			if (nloop < 0)
 				nloop = window_list_size;
 			sprintf(message, "loop->%d time->%.2d%.2d KEYUP", nloop, time_now->tm_min, time_now->tm_sec);
 			sfm_update_window_status(window_list[nloop], message);
 
 			break;
 		case SFM_KEY_ENTER:
-			if (iface->sfm_win_menu == window_list[nloop]) {
+			if (iface->sfm_win_menu == window_list[nloop])
+			{
 				ITEM *curr_item = current_item(iface->sfm_menu);
 				sfm_trigger_menu_action(curr_item);
 			}
 
 			sfm_update_window_status(window_list[nloop], "HELLO");
 			break;
-				
-/*		default:
-			nloop++;
-			if (nloop > window_list_size) 
-				nloop = 0;
-			break; */
+
+			/*		default:
+						nloop++;
+						if (nloop > window_list_size)
+							nloop = 0;
+						break; */
 		}
-	
+
 		wrefresh(window_list[nloop]);
 		keypad(window_list[nloop], TRUE);
 		refresh();

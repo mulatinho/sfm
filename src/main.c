@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 {
 	int ret, opt = 0;
 	char *env_pwd = getenv("PWD");
-	ctx = malloc(sizeof(struct context*));
+	ctx = malloc(sizeof(struct context *));
 
 	ctx->mode = SFM_MODE_GUI;
 	sfm_set_current_path(env_pwd);

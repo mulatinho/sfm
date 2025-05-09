@@ -103,10 +103,11 @@ void sfm_select_menu(GtkWidget *wid, gint option, gint y)
 		break;
 	}
 
-	if (option != 2) 
+	if (option != 2) {
 		sfm_set_current_path(current_path);
 		gtk_entry_set_text(GTK_ENTRY(sfm_gui.path_entry), sfm_get_current_path());
 		sfm_gui_list_directory(SFM_FILES_ALL);
+	}
 }
 
 /* void do_select(GtkWidget *wid, gint x, gint y)
@@ -146,8 +147,8 @@ void sfm_open(GtkWidget *wid, gpointer p)
 	GtkWidget *dialog;
 
 	dialog = gtk_file_chooser_dialog_new("Selecione arquivo.",
-										 GTK_WINDOW(wid), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL,
-										 GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+		GTK_WINDOW(wid), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL,
+		GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
 	{
@@ -202,7 +203,7 @@ void sfm_gui_list_directory(int hidden)
 	GError *gerror = NULL;
 	mfile *file_list = NULL;
 	char statusbar[NAME_MAX];
-	
+
 	BUFFER_ZERO(statusbar);
 	snprintf(statusbar, NAME_MAX - 1, "Directory: %s is opened - Well done!", sfm_get_current_path());
 
@@ -242,11 +243,11 @@ void sfm_gui_list_directory(int hidden)
 	while (file_list != NULL)
 	{
 		GdkPixbuf *pixbuf = NULL;
-		
+
 		if (S_ISDIR(file_list->fstat.st_mode))
 			pixbuf = pixbuf_directory;
 		else
-			pixbuf = pixbuf_file; 
+			pixbuf = pixbuf_file;
 
 		gtk_list_store_append(store, &iter);
 		gtk_list_store_set(store, &iter, SFM_ITEM_PATH, sfm_get_current_path(),
@@ -293,18 +294,20 @@ void sfm_callback_execute(GtkIconView *iconview,
 	gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, SFM_ITEM_NAME, &item, -1);
 
 	stat(item, &obj);
-	if (S_ISDIR(obj.st_mode)) {
+	if (S_ISDIR(obj.st_mode))
+	{
 		char directory[FILENAME_MAX];
 		BUFFER_ZERO(directory);
-		if (!strncmp(item, "..", 2)) 
+		if (!strncmp(item, "..", 2))
 			snprintf(directory, FILENAME_MAX - 1, "%s", dirname(sfm_get_current_path()));
 		else
 			snprintf(directory, FILENAME_MAX - 1, "%s/%s", sfm_get_current_path(), item);
-		
+
 		fprintf(stdout, "-=> %s:%d -> directory: %s\n", __FILE__, __LINE__, directory);
 		sfm_set_current_path(directory);
 		sfm_gui_list_directory(SFM_FILES_ALL);
-	} else 
+	}
+	else
 		sfm_exec_file(item);
 }
 

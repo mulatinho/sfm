@@ -107,11 +107,9 @@ void sfm_scan_directory(int hidden)
 	if (!ctx)
 		return;
 
-	SFM_DEBUG("currdir: %s", sfm_get_current_path());
 	sfm_mfile_free();
 
 	count = scandir(sfm_get_current_path(), &files, 0, alphasort);
-	SFM_DEBUG("%s", "JACK");
 	for (n = 0; n < count; n++)
 	{
 		BUFFER_ZERO(filename);
@@ -134,26 +132,16 @@ void sfm_set_current_path(char *name)
 	if (!ctx)
 		return;
 
-	//BUFFER_ZERO(ctx->sfm_current_path);
+	BUFFER_ZERO(ctx->sfm_current_path);
 	snprintf(ctx->sfm_current_path, FILENAME_MAX - 1, "%s\0", name);
 
 	stat(ctx->sfm_current_path, &fstat);
 	if (!S_ISDIR(fstat.st_mode))
 		return;
-	
+
 	SFM_DEBUG("mode is %d and path is %s\n", ctx->mode, sfm_get_current_path());
-	if (ctx->mode == SFM_MODE_GUI) {
-		chdir(sfm_get_current_path());
-		sfm_scan_directory(SFM_FILES_ALL);
-
-		SFM_DEBUG("%s\n", "end of sfm_set_current_path:SFM_GUI")
-	}
-
-	if (ctx->mode == SFM_MODE_NCURSES) {
-		return;
-	} 
-
-	SFM_DEBUG("%s\n", "end of sfm_set_current_path")
+	chdir(sfm_get_current_path());
+	sfm_scan_directory(SFM_FILES_ALL);
 }
 
 char *sfm_get_current_path(void)
