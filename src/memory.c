@@ -1,4 +1,7 @@
+#include "main.h"
 #include "memory.h"
+
+mfile *list;
 
 void sfm_mfile_insert(int *id, char *name, struct stat *stat)
 {

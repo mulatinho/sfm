@@ -20,7 +20,7 @@ void sfm_warn_message(gchar *title, gchar *message, gint width, gint height)
 {
 	GtkWidget *dialog, *label;
 
-	dialog = gtk_dialog_new_with_buttons(title, GTK_WINDOW(sfm.firstwin),
+	dialog = gtk_dialog_new_with_buttons(title, GTK_WINDOW(sfm_gui.firstwin),
 										 GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_NONE, NULL);
 	gtk_widget_set_usize(dialog, width, height);
 

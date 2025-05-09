@@ -21,10 +21,13 @@
 
 #include "main.h"
 
+struct context *ctx;
+
 int main(int argc, char **argv)
 {
 	int ret, opt = 0;
 	char *env_pwd = getenv("PWD");
+	ctx = malloc(sizeof(struct context*));
 
 #ifdef DEBUG
 	ret = sfm_config_init();
@@ -41,7 +44,8 @@ int main(int argc, char **argv)
 
 	if (argc <= 1)
 	{
-		sfm_gui();
+		ctx->mode = SFM_MODE_GUI;
+		sfm_gui_start(ctx);
 		return 0;
 	}
 	while ((opt = getopt(argc, argv, "gnv")) != -1)
@@ -53,7 +57,8 @@ int main(int argc, char **argv)
 			// user and hostname, future.
 			break;
 		case 'n':
-			sfm_ncurses();
+			ctx->mode = SFM_MODE_NCURSES;
+			sfm_ncurses(ctx);
 			break;
 		case 'v':
 			fprintf(stdout, SFM_VERSION);

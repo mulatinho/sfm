@@ -1,7 +1,7 @@
+#include "main.h"
+
 #ifndef _SFM_MEMORY_H_
 #define _SFM_MEMORY_H_
-
-#include "main.h"
 
 enum
 {

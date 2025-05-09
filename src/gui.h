@@ -31,7 +31,7 @@ typedef struct
 	GtkAccelGroup *accel_group;
 } sfm_t;
 
-extern sfm_t sfm;
+extern sfm_t sfm_gui;
 
 int sfm_smb_exec(char *);
 void do_select(GtkWidget *, gint, gint);

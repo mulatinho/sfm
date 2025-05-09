@@ -18,6 +18,4 @@ void sfm_set_current_path(char *);
 char *sfm_get_current_path();
 void sfm_warn_message(gchar *, gchar *, gint, gint);
 
-extern char sfm_current_path[FILENAME_MAX];
-
 #endif

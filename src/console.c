@@ -106,9 +106,9 @@ void sfm_make_menu(void)
 	post_menu(iface->sfm_menu);
 
 	sfm_refresh_window(iface->sfm_win_menu);
-	free(iface->sfm_menu);
-	for (int i = 0; i < n_menu_choices; i++)
-		free(iface->sfm_menu_items[i]);
+	// free(iface->sfm_menu);
+	// for (int i = 0; i < n_menu_choices; i++)
+	// 	free(iface->sfm_menu_items[i]);
 }
 
 void sfm_make_window_file_list(void)
@@ -141,7 +141,7 @@ void sfm_make_window_file_list(void)
 		free(iface->sfm_menu_items[i]);
 }
 
-void sfm_make_windows(void)
+void sfm_make_windows(struct context *ctx)
 {
 	int nloop, c;
 	iface = malloc(sizeof(sfm_ncurses_win));
@@ -247,7 +247,7 @@ void sfm_free(void)
 	free(iface);
 }
 
-void sfm_ncurses(void)
+void sfm_ncurses(struct context *ctx)
 {
-	sfm_make_windows();
+	sfm_make_windows(ctx);
 }

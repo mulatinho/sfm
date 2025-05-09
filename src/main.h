@@ -59,7 +59,20 @@
 #define SFM_VERSION PROGNAME " v" PROGVERSION "\nWritten by " PROGAUTHOR "\n"
 #define SFM_VSN PROGNAME " v" PROGVERSION
 
-void sfm_gui(void);
-void sfm_ncurses(void);
+enum {
+    SFM_MODE_NCURSES,
+    SFM_MODE_GUI
+};
+
+struct context {
+    int mode;
+    char sfm_current_path[FILENAME_MAX];
+};
+
+extern struct context *ctx;
+extern mfile *list;
+
+void sfm_gui_start(struct context *);
+void sfm_ncurses(struct context *);
 
 #endif
