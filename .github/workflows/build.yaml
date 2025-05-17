@@ -19,8 +19,5 @@ jobs:
         run: |-
           echo "$TOKEN" | docker login -u mulatinho --password-stdin
           docker build -t mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER .
-          docker tag mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER mulatinho/sfm:latest
-          docker push mulatinho/sfm:1.0.$GITHUB_RUN_NUMBER
-          docker push mulatinho/sfm:latest
         env:
           TOKEN: ${{ secrets.PAT_DOCKER }}
