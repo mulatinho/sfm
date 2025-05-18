@@ -1,0 +1,30 @@
+name: build
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-pr:
+    runs-on: ubuntu-latest
+    env:
+      REPO_NAME: ${{ github.event.repository.name }}
+    container:
+      image: mulatinho/build-c:alpine
+      volumes: 
+        - /__w/${REPO_NAME}/${REPO_NAME}:/app
+    
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: List contents
+        run: ls -lah /app
+
+      - name: build
+        run: make
+
+      - name: test
+        run: find tests/ -type f -executable | while read test; do ./$test; done
+
